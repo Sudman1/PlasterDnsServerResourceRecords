@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<plasterManifest
+  schemaVersion="1.0" xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1">
+  <metadata>
+    <name>DnsRecordResource</name>
+    <id>4a361b9d-8df4-4b25-bb6e-9f06152c15a0</id>
+    <version>0.0.1</version>
+    <title>DSC Class Based DNS Record Template</title>
+    <description>A template to add a Class based resource for a new DNS record type to the xDnsServer Project</description>
+    <author>James Sudbury</author>
+    <tags>DNS, DSC, xDnsServer, DnsServerDSC</tags>
+  </metadata>
+  <parameters>
+    <parameter store="text"  name="ResourceRecordType" type="text" prompt="Name of your DNS record type (PascalCase) (i.e.: Srv, Aaaa, Cname, Ptr)" />
+    <parameter store="text"  name="KeyParams" type="text" prompt="List the KEY parameters with their types and example values, separated by commas (i.e.: [version] Ipv4Address='1.1.1.1', [string] Test='Test', [int] Priority=0) (Do not include ZoneName, TimeToLive, DnsServer, or Ensure)`n" />
+    <parameter store="text"  name="MandatoryParams" type="text" prompt="List the MANDATORY parameters with their types, separated by commas (i.e.: [version] Ipv4Address='1.1.1.1', [string] Test='Test', [int] Priority=0) (Do not include ZoneName, TimeToLive, DnsServer, or Ensure)`n" default=" " />
+    <parameter store="text"  name="OptionalParams" type="text" prompt="List the OPTIONAL parameters with their types, separated by commas (i.e.: [version] Ipv4Address='1.1.1.1', [string] Test='Test', [int] Priority=0) (Do not include ZoneName, TimeToLive, DnsServer, or Ensure)`n" default=" " />
+
+  </parameters>
+    <!--
+      condition=''
+      ${PLASTER_PARAM_ModuleType}         SimpleModule CustomModule CompleteSample SimpleModule_NoBuild  SharedDscConfig
+      -in @("SimpleModule","CustomModule","CompleteSample","SimpleModule_NoBuild","SharedDscConfig")
+      ${PLASTER_PARAM_ModuleAuthor}
+      ${PLASTER_PARAM_ModuleName}
+      ${PLASTER_PARAM_ModuleDescription}
+      ${PLASTER_PARAM_ModuleVersion}
+      ${PLASTER_PARAM_License}            true false
+      ${PLASTER_PARAM_LicenseType}        Apache MIT None
+      ${PLASTER_PARAM_Features}           All UnitTests ModuleQuality AppVeyor TestKitchen Gherkin DSCResources Enum Classes SampleScripts git
+
+     -->
+  <content>
+      <!--   source/Classes Folder -->
+      <file source=''
+            destination='source/Classes'
+      />
+
+      <!--   source/Classes/DSC_RecordResource.ps1 file -->
+      <templateFile source='DSC_RecordResource.ps1.template'
+            destination='source/Classes/DnsRecord${PLASTER_PARAM_ResourceRecordType}.ps1'
+      />
+
+      <!--   source/Classes/DSC_RecordResourceScoped.ps1 file -->
+      <templateFile source='DSC_RecordResourceScoped.ps1.template'
+            destination='source/Classes/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped.ps1'
+      />
+
+      <!--   source/en-US/DnsRecordResource.strings.pd1 file -->
+      <templateFile source='en-US/DnsServerRecordResource.strings.psd1.template'
+            destination='source/en-US/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}.strings.psd1'
+      />
+
+      <!--   source/en-US/DnsRecordResource.strings.pd1 file -->
+      <templateFile source='en-US/DnsServerRecordResource.strings.psd1.template'
+            destination='source/en-US/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.strings.psd1'
+      />
+
+      <!--   tests/Unit/Classes Folder -->
+      <file source='' destination='tests/Unit/Classes' />
+
+      <!--   tests/Classes/tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template -->
+      <templateFile source='tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template'
+            destination='tests/Unit/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}.tests.ps1'
+      />
+
+      <!--   tests/Classes/tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template -->
+      <templateFile source='tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template'
+            destination='tests/Unit/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.tests.ps1'
+      />
+
+      <!--   tests/Integration/Classes Folder -->
+      <file source='' destination='tests/Integration/Classes' />
+
+      <!--   tests/Classes/tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template -->
+      <templateFile source='tests/Integration/DSC_ClassResource.tests.ps1.template'
+            destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}.tests.ps1'
+      />
+
+      <!--   tests/Classes/tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template -->
+      <templateFile source='tests/Integration/DSC_ClassResource.tests.ps1.template'
+            destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.tests.ps1'
+      />
+
+      <!--   source/Examples/Resources/DnsRecordXXX Folder -->
+      <file source='' destination='source/Examples/Resources/DnsRecord${PLASTER_PARAM_ResourceRecordType}' />
+
+      <!--   examples/1-DnsRecord_Mandatory_config.ps1 -->
+      <templateFile source='examples/1-DnsRecord_Mandatory_config.ps1'
+            destination='source/Examples/Resources/DnsRecord${PLASTER_PARAM_ResourceRecordType}/1-DnsRecord${PLASTER_PARAM_ResourceRecordType}_Mandatory_config.ps1'
+      />
+
+      <!--   examples/1-DnsRecord_Full_config.ps1 -->
+      <templateFile source='examples/2-DnsRecord_Full_config.ps1'
+            destination='source/Examples/Resources/DnsRecord${PLASTER_PARAM_ResourceRecordType}/2-DnsRecord${PLASTER_PARAM_ResourceRecordType}_Full_config.ps1'
+      />
+
+      <!--   examples/1-DnsRecord_Remove_config.ps1 -->
+      <templateFile source='examples/3-DnsRecord_Remove_config.ps1'
+            destination='source/Examples/Resources/DnsRecord${PLASTER_PARAM_ResourceRecordType}/3-DnsRecord${PLASTER_PARAM_ResourceRecordType}_Remove_config.ps1'
+      />
+
+
+      <!--   source/Examples/Resources/DnsRecordXXXScoped Folder -->
+      <file source='' destination='source/Examples/Resources/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped' />
+
+      <!--   examples/1-DnsRecord_Mandatory_config.ps1 -->
+      <templateFile source='examples/1-DnsRecordScoped_Mandatory_config.ps1'
+            destination='source/Examples/Resources/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped/1-DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped_Mandatory_config.ps1'
+      />
+
+      <!--   examples/1-DnsRecord_Full_config.ps1 -->
+      <templateFile source='examples/2-DnsRecordScoped_Full_config.ps1'
+            destination='source/Examples/Resources/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped/2-DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped_Full_config.ps1'
+      />
+
+      <!--   examples/1-DnsRecord_Remove_config.ps1 -->
+      <templateFile source='examples/3-DnsRecordScoped_Remove_config.ps1'
+            destination='source/Examples/Resources/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped/3-DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped_Remove_config.ps1'
+      />
+
+  </content>
+</plasterManifest>
