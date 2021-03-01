@@ -11,7 +11,7 @@ Based on Gael Colas' [Sampler ClassResource Template](https://github.com/gaelcol
 |:--------:|-----------|
 |          | Record Class Template |
 |          | Scoped Record Class Template |
-|          | Localization Strings |
+|     X    | Localization Strings |
 |     X    | Record Examples |
 |     X    | Scoped Record Examples |
 |          | Unit Tests |
