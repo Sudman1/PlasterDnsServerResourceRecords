@@ -5,3 +5,4 @@ Port,Key,System.UInt16,The TCP or UDP port on which the service is found.,5222,
 Target,Key,System.String,Specifies the Target Hostname or IP Address.,'chat.contoso.com',
 Priority,Mandatory,System.UInt16,Specifies the Priority value of the SRV record.,20,200
 Weight,Mandatory,System.UInt16,Specifies the weight of the SRV record.,30,
+Opt,,System.String,"Not Real",'Foo','Bar'

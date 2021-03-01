@@ -4,25 +4,12 @@
     .PARAMETER ZoneName
         Specifies the name of a DNS zone. (Key Parameter)
 <%
-    $parameterDefinitions = $PLASTER_PARAM_KeyParams -split ",\s*"
-    foreach ($paramDef in $parameterDefinitions) {
-        $regexMatches = $paramDef | Select-String "\[(.*)\]\s*(.*)\s*=(.*)"
-"    .PARAMETER $($regexMatches.Matches.Groups[2].Value)"
-"        (Key Parameter)"
-    }
+    $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
-    $parameterDefinitions = $PLASTER_PARAM_MandatoryParams -split ",\s*"
-    foreach ($paramDef in $parameterDefinitions) {
-        $regexMatches = $paramDef | Select-String "\[(.*)\]\s*(.*)\s*=(.*)"
-"    .PARAMETER $($regexMatches.Matches.Groups[2].Value)"
-"        (Mandatory Parameter)"
-    }
-    
-    $parameterDefinitions = $PLASTER_PARAM_OptionalParams -split ",\s*"
-    foreach ($paramDef in $parameterDefinitions) {
-        $regexMatches = $paramDef | Select-String "\[(.*)\]\s*(.*)\s*=(.*)"
-"    .PARAMETER $($regexMatches.Matches.Groups[2].Value)"
-"        (Optional Parameter)"
+    foreach ($paramDef in $propertyData) {
+        "    .PARAMETER $($paramDef.Name)"
+        if ([string]::IsNullOrEmpty($paramDef.Required)) { $paramDef.Required = "Optional" }
+        "       $($paramDef.Description) ($($paramDef.Required) Parameter)"
     }
 %>
     .PARAMETER TimeToLive
@@ -39,31 +26,15 @@ $script:localizedDataDnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> = Get-Loc
 class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> : DnsRecordBase
 {
 <%
-    $parameterDefinitions = $PLASTER_PARAM_KeyParams -split ",\s*"
-    foreach ($paramDef in $parameterDefinitions) {
-        $regexMatches = $paramDef | Select-String "\[(.*)\]\s*(.*)\s*=(.*)"
-"    [DscProperty(Key)]"
-"    [$($regexMatches.Matches.Groups[1].Value)] $($regexMatches.Matches.Groups[2].Value)"
-""
-    }
 
-    $parameterDefinitions = $PLASTER_PARAM_MandatoryParams -split ",\s*"
-    foreach ($paramDef in $parameterDefinitions) {
-        $regexMatches = $paramDef | Select-String "\[(.*)\]\s*(.*)\s*=(.*)"
-"    [DscProperty(Mandatory)]"
-"    [$($regexMatches.Matches.Groups[1].Value)] $($regexMatches.Matches.Groups[2].Value)"
-""
-    }
-    
-    $parameterDefinitions = $PLASTER_PARAM_OptionalParams -split ",\s*"
-    foreach ($paramDef in $parameterDefinitions) {
-        $regexMatches = $paramDef | Select-String "\[(.*)\]\s*(.*)\s*=(.*)"
-"    [DscProperty()]"
-"    [$($regexMatches.Matches.Groups[1].Value)] $($regexMatches.Matches.Groups[2].Value)"
-""
+    $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+    foreach ($paramDef in $propertyData) {
+        "    [DscProperty($($paramDef.Required))]"
+        "    [$($paramDef.ObjectType)] `$$($paramDef.Name)"
+        ""
     }
 %>
-    
     [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] Get()
     {
         return ([DnsRecordBase] $this).Get()

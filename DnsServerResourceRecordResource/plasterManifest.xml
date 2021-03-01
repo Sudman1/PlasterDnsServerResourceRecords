@@ -13,10 +13,6 @@
   <parameters>
     <parameter store="text"  name="ResourceRecordType" type="text" prompt="Name of your DNS record type (PascalCase) (i.e.: Srv, Aaaa, Cname, Ptr)" />
     <parameter store="text"  name="PropDir" type="text" prompt="Path to the directory holding the property definition files" />
-    <parameter store="text"  name="KeyParams" type="text" prompt="List the KEY parameters with their types and example values, separated by commas (i.e.: [version] Ipv4Address='1.1.1.1', [string] Test='Test', [int] Priority=0) (Do not include ZoneName, TimeToLive, DnsServer, or Ensure)`n" />
-    <parameter store="text"  name="MandatoryParams" type="text" prompt="List the MANDATORY parameters with their types, separated by commas (i.e.: [version] Ipv4Address='1.1.1.1', [string] Test='Test', [int] Priority=0) (Do not include ZoneName, TimeToLive, DnsServer, or Ensure)`n" default=" " />
-    <parameter store="text"  name="OptionalParams" type="text" prompt="List the OPTIONAL parameters with their types, separated by commas (i.e.: [version] Ipv4Address='1.1.1.1', [string] Test='Test', [int] Priority=0) (Do not include ZoneName, TimeToLive, DnsServer, or Ensure)`n" default=" " />
-
   </parameters>
     <!--
       condition=''

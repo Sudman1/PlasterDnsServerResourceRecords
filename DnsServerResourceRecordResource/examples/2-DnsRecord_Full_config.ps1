@@ -48,20 +48,14 @@ Configuration DnsRecordSrv_config
         DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> 'TestRecord'
         {
 <%
-$props = @()
-$padSize = 0
-$parameterDefinitions = "$PLASTER_PARAM_KeyParams, $PLASTER_PARAM_MandatoryParams" -split ",\s*"
-foreach ($paramDef in $parameterDefinitions) {
-    $prop = $paramDef -split "]\s*" | Select-Object -Last 1
-    $props += $prop
-    $padSize = [math]::Max($padSize, ($prop.Length + 1))
-}
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
 "            $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
 
-foreach ($prop in $props) {
-    $propName, $propVal = $prop -split '\s*=\s*'
-"            $($propName.PadRight($padSize)) = $propVal"
+foreach ($paramDef in $propertyData) {
+    "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
 }
 
 "            $('TimeToLive'.PadRight($padSize)) = '01:00:00'"

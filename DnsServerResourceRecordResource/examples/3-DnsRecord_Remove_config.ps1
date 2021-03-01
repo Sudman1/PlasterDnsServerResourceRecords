@@ -38,7 +38,7 @@ Updated author, copyright notice, and URLs.
     .DESCRIPTION
         This configuration will ensure a DNS <%= $PLASTER_PARAM_ResourceRecordType %> record does not exist when mandatory properties are specified.
 
-        Note that not all mandatory properties are key properties. Non-key property values will be ignored when determining whether the record is to be removed.
+        Note that not all mandatory properties are necessarily key properties. Non-key property values will be ignored when determining whether the record is to be removed.
 #>
 
 Configuration DnsRecordSrv_config
@@ -50,20 +50,14 @@ Configuration DnsRecordSrv_config
         DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> 'TestRecord'
         {
 <%
-$props = @()
-$padSize = 0
-$parameterDefinitions = "$PLASTER_PARAM_KeyParams, $PLASTER_PARAM_MandatoryParams" -split ",\s*"
-foreach ($paramDef in $parameterDefinitions) {
-    $prop = $paramDef -split "]\s*" | Select-Object -Last 1
-    $props += $prop
-    $padSize = [math]::Max($padSize, ($prop.Length + 1))
-}
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
 "            $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
 
-foreach ($prop in $props) {
-    $propName, $propVal = $prop -split '\s*=\s*'
-"            $($propName.PadRight($padSize)) = $propVal"
+foreach ($paramDef in $propertyData) {
+    "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
 }
 
 "            $('Ensure'.PadRight($padSize)) = 'Absent'"
