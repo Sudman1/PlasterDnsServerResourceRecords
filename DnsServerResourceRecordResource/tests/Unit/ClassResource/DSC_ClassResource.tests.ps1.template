@@ -7,139 +7,181 @@
 $ProjectPath = "$PSScriptRoot\..\..\.." | Convert-Path
 $ProjectName = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
         ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
-        $(try { Test-ModuleManifest $_.FullName -ErrorAction Stop }catch{$false}) }
-    ).BaseName
+        $(try
+            {
+                Test-ModuleManifest $_.FullName -ErrorAction Stop
+            }
+            catch
+            {
+                $false
+            }) }
+).BaseName
 
 Import-Module $ProjectName
 
+Get-Module -Name 'DnsServer' -All | Remove-Module -Force
+Import-Module -Name "$($PSScriptRoot)\..\Stubs\DnsServer.psm1"
+
 InModuleScope $ProjectName {
-    Describe DSC_<%=$PLASTER_PARAM_ResourceName %> {
+
+    Describe DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> -Tag 'DnsRecord', 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>' {
 
         Context 'Constructors' {
-            It 'Should not throw an exception when instanciate it' {
-                { [DSC_<%=$PLASTER_PARAM_ResourceName %>]::new() } | Should -Not -Throw
+            It 'Should not throw an exception when instantiate it' {
+                { [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>]::new() } | Should -Not -Throw
             }
 
             It 'Has a default or empty constructor' {
-                $instance = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::new()
+                $instance = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>]::new()
                 $instance | Should -Not -BeNullOrEmpty
-                $instance.GetType().Name | Should -Be 'DSC_<%=$PLASTER_PARAM_ResourceName %>'
+                $instance.GetType().Name | Should -Be 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>'
             }
         }
 
         Context 'Type creation' {
-            It 'Should be type named DSC_<%=$PLASTER_PARAM_ResourceName %>' {
-                $instance = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::new()
-                $instance.GetType().Name | Should -Be 'DSC_<%=$PLASTER_PARAM_ResourceName %>'
+            It 'Should be type named DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>' {
+                $instance = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>]::new()
+                $instance.GetType().Name | Should -Be 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>'
             }
         }
     }
 
-    Describe "Testing Get Method" -Tag 'Get' {
-        BeforeAll {
-            $script:mockItemName = 'dummyName'
-            $script:mockItem     = [pscustomobject]@{
-                Name                       = $script:mockItemName
-                PropertyMandatory          = $false
-                PropertyBoolReadWrite      = $false
-                PropertyBoolReadOnly       = $PropertyBoolReadOnly
-                PropertyStringReadOnly     = $PropertyStringReadOnly
-            }
-        }
-
+    Describe "Testing DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> Get Method" -Tag 'Get', 'DnsRecord', 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>' {
         BeforeEach {
-            $script:instanceDesiredState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-            $script:instanceDesiredState.Name = $script:mockItemName
-            $script:instanceDesiredState.Ensure = [Ensure]::Present
-            $script:instanceDesiredState.PropertyMandatory = $true
+            $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+
+foreach ($paramDef in $propertyData) {
+    "                $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+%>
+            }
         }
 
         Context "When the configuration is absent" {
             BeforeAll {
-                Mock -CommandName Get-DummyObject -MockWith {
-                    return $null
-                } -Verifiable
+                Mock -CommandName Get-DnsServerResourceRecord -MockWith {
+                    Write-Verbose "Mock Get-DnsServerResourceRecord Called" -Verbose
+                }
             }
 
             It 'Should return the state as absent' {
-                $script:instanceDesiredState.Get().Ensure | Should -Be 'Absent'
-                Assert-MockCalled Get-DummyObject -Exactly -Times 1 -Scope It
+                $currentState = $script:instanceDesiredState.Get()
+
+                Assert-MockCalled Get-DnsServerResourceRecord -Exactly -Times 1 -Scope It
+                $currentState.Ensure | Should -Be 'Absent'
             }
 
-            It 'Should return the same values as present in properties' {
+            It 'Should return the same values as present in Key properties' {
                 $getMethodResourceResult = $script:instanceDesiredState.Get()
 
-                $getMethodResourceResult.Name | Should -Be $script:instanceDesiredState.Name
-                $getMethodResourceResult.PropertyMandatory | Should -Be $script:instanceDesiredState.PropertyMandatory
+                $getMethodResourceResult.ZoneName | Should -Be $script:instanceDesiredState.ZoneName
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required -eq 'Key' }
+
+foreach ($paramDef in $propertyData) {
+    "                `$getMethodResourceResult.$($paramDef.Name) | Should -Be `$script:instanceDesiredState.$($paramDef.Name)"
+}
+%>
             }
 
-            It 'Should return $false or $null respectively for the rest of the properties' {
+            It 'Should return $false or $null respectively for the rest of the non-key properties' {
                 $getMethodResourceResult = $script:instanceDesiredState.Get()
 
-                $getMethodResourceResult.PropertyBoolReadWrite | Should -Be $false
-                $getMethodResourceResult.PropertyBoolReadOnly | Should -Be $false
-                $getMethodResourceResult.PropertyStringReadOnly | Should -BeNullOrEmpty
-            }
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required -ne 'Key' }
 
-            It 'Should return Reason because the item is absent' {
-                $getMethodResourceResult = $script:instanceDesiredState.Get()
-
-                $getMethodResourceResult.Reasons.Code | Should -Contain 'DSC_<%=$PLASTER_PARAM_ResourceName %>:DSC_<%=$PLASTER_PARAM_ResourceName %>:Ensure'
+foreach ($paramDef in $propertyData) {
+    "                [bool] `$getMethodResourceResult.$($paramDef.Name) | Should -Be $false"
+}
+%>
+                $getMethodResourceResult.TimeToLive | Should -BeNullOrEmpty
+                $getMethodResourceResult.DnsServer | Should -Be 'localhost'
             }
         }
 
         Context "When the configuration is present" {
             BeforeAll {
-                Mock -CommandName Get-DummyObject -MockWith {
-                    return $script:mockItem
+                $mockInstancesPath = Resolve-Path -Path $PSScriptRoot
+
+                Mock -CommandName Get-DnsServerResourceRecord -MockWith {
+                    Write-Verbose "Mock Get-DnsServerResourceRecord Called" -Verbose
+
+                    return Import-Clixml -Path "$($mockInstancesPath)\..\MockObjects\<%= $PLASTER_PARAM_ResourceRecordType %>RecordInstance.xml"
                 }
             }
 
             It 'Should return the state as present' {
-                $script:instanceDesiredState.Get().Ensure | Should -Be 'Present'
+                $currentState = $script:instanceDesiredState.Get()
 
-                Assert-MockCalled Get-DummyObject -Exactly -Times 1 -Scope It
+                Assert-MockCalled Get-DnsServerResourceRecord -Exactly -Times 1 -Scope It
+                $currentState.Ensure | Should -Be 'Present'
             }
 
-            It 'Should return the same values as present in properties' {
+            It 'Should return the same values as present in Key properties' {
                 $getMethodResourceResult = $script:instanceDesiredState.Get()
 
-                $getMethodResourceResult.Name | Should -Be $script:instanceDesiredState.Name
-                $getMethodResourceResult.PropertyMandatory | Should -Be $script:instanceDesiredState.PropertyMandatory
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required -eq 'Key' }
+
+foreach ($paramDef in $propertyData) {
+    "                `$getMethodResourceResult.$($paramDef.Name) | Should -Be `$script:instanceDesiredState.$($paramDef.Name)"
+}
+%>
             }
         }
 
     }
 
-    Describe "Testing Test Method" -Tag 'Test' {
+    Describe "Testing DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> Test Method" -Tag 'Test', 'DnsRecord', 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>' {
         BeforeAll {
-            # change mocking
-            $script:mockItemName = 'dummyName'
-            $script:mockItem     = [pscustomobject]@{
-                Name                       = $script:mockItemName
-                PropertyMandatory          = $true
-                PropertyBoolReadWrite      = $false
-                PropertyBoolReadOnly       = $PropertyBoolReadOnly
-                PropertyStringReadOnly     = $PropertyStringReadOnly
-            }
         }
 
         Context 'When the system is in the desired state' {
             Context 'When the configuration are absent' {
                 BeforeEach {
-                    $script:instanceDesiredState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                    $script:instanceDesiredState.Name = $script:mockItemName
-                    $script:instanceDesiredState.Ensure = [Ensure]::Absent
+                    $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+%>
+                    }
 
                     #Override Get() method
                     $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
                         -Value {
-                            $mockInstanceCurrentState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                            $mockInstanceCurrentState.Name = $script:mockItemName
-                            $mockInstanceCurrentState.Ensure = [Ensure]::Absent
+                        $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
 
-                            return $mockInstanceCurrentState
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+%>
                         }
+
+                        return $mockInstanceCurrentState
+                    }
                 }
 
                 It 'Should return $true' {
@@ -149,24 +191,40 @@ InModuleScope $ProjectName {
 
             Context 'When the configuration are present' {
                 BeforeEach {
-                    $script:instanceDesiredState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                    $script:instanceDesiredState.Name = $script:mockItemName
-                    $script:instanceDesiredState.Ensure = [Ensure]::Present
-                    $script:instanceDesiredState.PropertyMandatory = $true
-                    $script:instanceDesiredState.PropertyBoolReadWrite = $true
+                    $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+%>
+                    }
 
                     $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
                         -Value {
-                            $mockInstanceCurrentState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                            $mockInstanceCurrentState.Name = $script:mockItemName
-                            $mockInstanceCurrentState.Ensure = [Ensure]::Present
-                            $mockInstanceCurrentState.PropertyMandatory = $true
-                            $mockInstanceCurrentState.PropertyBoolReadWrite = $true
-                            $mockInstanceCurrentState.PropertyBoolReadOnly = $true
-                            $mockInstanceCurrentState.PropertyStringReadOnly = 'This is a readonly string'
+                        $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
 
-                            return $mockInstanceCurrentState
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+%>
                         }
+
+                        return $mockInstanceCurrentState
+                    }
                 }
 
                 It 'Should return $true' {
@@ -178,23 +236,43 @@ InModuleScope $ProjectName {
         Context 'When the system is not in the desired state' {
             Context 'When the configuration should be absent' {
                 BeforeEach {
-                    $script:instanceDesiredState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                    $script:instanceDesiredState.Name = $script:mockItemName
-                    $script:instanceDesiredState.Ensure = [Ensure]::Absent
+                    $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+%>
+                    }
 
                     #Override Get() method
                     $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
                         -Value {
-                            $mockInstanceCurrentState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                            $mockInstanceCurrentState.Name = $script:mockItemName
-                            $mockInstanceCurrentState.Ensure = [Ensure]::Present
-                            $mockInstanceCurrentState.Reasons += [Reason]@{
-                                Code = '{0}:{0}:Ensure' -f $this.GetType()
-                                Phrase = ''
-                            }
+                        $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
 
-                            return $mockInstanceCurrentState
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+%>
                         }
+
+                        return $mockInstanceCurrentState
+                    }
                 }
                 It 'Should return $false' {
                     $script:instanceDesiredState.Test() | Should -BeFalse
@@ -203,96 +281,131 @@ InModuleScope $ProjectName {
 
             Context 'When the configuration should be present' {
                 BeforeEach {
-                    $script:instanceDesiredState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                    $script:instanceDesiredState.Name = $script:mockItemName
-                    $script:instanceDesiredState.Ensure = [Ensure]::Present
+                    $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('TimeToLive'.PadRight($padSize)) = '1:00:00'"
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+%>
+                    }
                 }
 
-                $testCase = @(
-                    @{
-                        Name      = 'dummyName'
-                        PropertyMandatory  = $true
-                        PropertyBoolReadWrite    = $false
-                        PropertyBoolReadOnly    = $false
-                        PropertyStringReadOnly = $null
-                    },
-                    @{
-                        Name      = 'dummyName'
-                        PropertyMandatory  = $false
-                        PropertyBoolReadWrite    = $true
-                        PropertyBoolReadOnly    = $false
-                        PropertyStringReadOnly = $null
-                    }
-                )
-
-                It 'Should return $false' {
+                It 'Should return $false when the object is not found' {
                     #Override Get() method
                     $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
                         -Value {
-                            $mockInstanceCurrentState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                            $mockInstanceCurrentState.Name = $script:mockItemName
-                            $mockInstanceCurrentState.Ensure = [Ensure]::Absent
-                            $mockInstanceCurrentState.Reasons += [Reason]@{
-                                Code = '{0}:{0}:Ensure' -f $this.GetType()
-                                Phrase = ''
-                            }
+                        $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
 
-                            return $mockInstanceCurrentState
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+%>
                         }
+
+                        return $mockInstanceCurrentState
+                    }
                     $script:instanceDesiredState.Test() | Should -BeFalse
                 }
 
-                It 'Should return $false when PropertyMandatory is <PropertyMandatory>, and PropertyBoolReadWrite is <PropertyBoolReadWrite>' -TestCases $testCase {
+
+                $testCasesToFail = @(
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+foreach ($nonKeyProp in ($propertyData | Where-Object { $_.Required -ne 'Key'})) {
+    "                    @{"
+    "                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+
+    foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+        "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+    }
+
+    foreach ($paramDef in ($propertyData | Where-Object {$_.Required -ne 'Key'})) {
+        if ($paramDef.Name -eq $nonKeyProp.Name) {
+            "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleUndesiredValue) # Undesired"
+        } else {
+            "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+        }
+    }
+
+    "                        $('DnsServer'.PadRight($padSize)) = 'localhost'"
+    "                        $('TimeToLive'.PadRight($padSize)) = '01:00:00'"
+    "                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+    "                    },"
+}
+%>
+                    @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('DnsServer'.PadRight($padSize)) = 'localhost'"
+"                        $('TimeToLive'.PadRight($padSize)) = '02:00:00' # Undesired"
+"                        $('Ensure'.PadRight($padSize)) = 'Present'"
+%>
+                    }
+                )
+
+                It 'Should return $false when non-key values are not in the desired state.' -TestCases $testCasesToFail {
                     param
                     (
-                        [System.String]
-                        $Name,
+                        [System.String] $ZoneName,
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
-                        [System.Boolean]
-                        $PropertyMandatory,
-
-                        [System.Boolean]
-                        $PropertyBoolReadWrite,
-
-                        [System.Boolean]
-                        $PropertyBoolReadOnly,
-
-                        [System.String]
-                        $PropertyStringReadOnly
+foreach ($paramDef in $propertyData) {
+    "                        [$($paramDef.ObjectType)] $($paramDef.Name),"
+}
+%>
+                        [System.String] $TimeToLive
                     )
                     #Override Get() method
                     $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
                         -Value {
-                            $mockInstanceCurrentState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                            $mockInstanceCurrentState.Name = $Name
-                            $mockInstanceCurrentState.Ensure = [Ensure]::Present
-                            $mockInstanceCurrentState.PropertyMandatory = $PropertyMandatory
-                            $mockInstanceCurrentState.PropertyBoolReadWrite = $PropertyBoolReadWrite
-                            $mockInstanceCurrentState.PropertyBoolReadOnly = $PropertyBoolReadOnly
-                            $mockInstanceCurrentState.PropertyStringReadOnly = $PropertyStringReadOnly
+                        $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
 
-                            if ($this.PropertyMandatory -ne $PropertyMandatory)
-                            {
-                                $mockInstanceCurrentState.Reasons += [Reason]@{
-                                    Code = '{0}:{0}:PropertyMandatory' -f $this.GetType()
-                                    Phrase = ''
-                                }
-                            }
-                            if ($this.PropertyBoolReadWrite -ne $PropertyBoolReadWrite)
-                            {
-                                $mockInstanceCurrentState.Reasons += [Reason]@{
-                                    Code = '{0}:{0}:PropertyBoolReadWrite' -f $this.GetType()
-                                    Phrase = ''
-                                }
-                            }
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
-                            return $mockInstanceCurrentState
+"                           $('ZoneName'.PadRight($padSize)) = `$ZoneName"
+
+foreach ($paramDef in $propertyData) {
+    "                           $($paramDef.Name.PadRight($padSize)) = `$$($paramDef.Name)"
+}
+
+"                           $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+%>
                         }
 
-                    $script:instanceDesiredState.Name = $Name
-                    $script:instanceDesiredState.PropertyMandatory = $false
-                    $script:instanceDesiredState.PropertyBoolReadWrite = $false
+                        return $mockInstanceCurrentState
+                    }
 
                     $script:instanceDesiredState.Test() | Should -BeFalse
                 }
@@ -300,63 +413,54 @@ InModuleScope $ProjectName {
         }
     }
 
-    Describe "Testing Set Method" -Tag 'Set' {
+    Describe "Testing DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> Set Method" -Tag 'Set', 'DnsRecord', 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>' {
         BeforeAll {
-            $script:mockItemName = 'dummyName'
-            $script:mockItem     = [pscustomobject]@{
-                Name                       = $script:mockItemName
-                PropertyMandatory          = $false
-                PropertyBoolReadWrite      = $false
-                PropertyBoolReadOnly       = $PropertyBoolReadOnly
-                PropertyStringReadOnly     = $PropertyStringReadOnly
-            }
+            # Mock the Add-DnsServerResourceRecord cmdlet to return nothing
+            Mock -CommandName Add-DnsServerResourceRecord -MockWith {
+                Write-Verbose "Mock Add-DnsServerResourceRecord Called" -Verbose
+            } -Verifiable
+
+            # Mock the Remove-DnsServerResourceRecord cmdlet to return nothing
+            Mock -CommandName Remove-DnsServerResourceRecord -MockWith {
+                Write-Verbose "Mock Remove-DnsServerResourceRecord Called" -Verbose
+            } -Verifiable
         }
 
         Context 'When the system is not in the desired state' {
             BeforeAll {
-                Mock -CommandName Set-HelpFunctionProperty
-            }
+                $mockInstancesPath = Resolve-Path -Path $PSScriptRoot
 
-            AfterEach {
-                <#
-                    Make sure to remove the test test so that it does
-                    not exist for other tests.
+                Mock -CommandName Get-DnsServerResourceRecord -MockWith {
+                    Write-Verbose "Mock Get-DnsServerResourceRecord Called" -Verbose
 
-                    You can uncomment this command and replace by what do
-                    you need.
+                    $mockRecord = Import-Clixml -Path "$($mockInstancesPath)\..\MockObjects\<%= $PLASTER_PARAM_ResourceRecordType %>RecordInstance.xml"
 
-                if ($script:mockItem)
-                {
-                    Remove-###
+                    # Set a wrong value
+                    $mockRecord.TimeToLive = [System.TimeSpan] '2:00:00'
+
+                    return $mockRecord
                 }
-                #>
             }
 
             Context 'When the configuration should be absent' {
                 BeforeAll {
-                    $script:instanceDesiredState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                    $script:instanceDesiredState.Name = $script:mockItemName
+                    $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
-                    #Override Get() method
-                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
-                        -Value {
-                            $mockInstanceCurrentState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                            $mockInstanceCurrentState.Name = $script:mockItemName
-                            $mockInstanceCurrentState.Ensure = [Ensure]::Present
-                            $mockInstanceCurrentState.Reasons += [Reason]@{
-                                Code = '{0}:{0}:Ensure' -f $this.GetType()
-                                Phrase = ''
-                            }
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
-                            return $mockInstanceCurrentState
-                        }
-                    <#
-                        Replace the mock command by yours.
-                        And replace the name of properties
-                    Mock -CommandName Remove-### -ParameterFilter {
-                        $Name -eq $script:mockInstanceCurrentState.Name
-                    } -Verifiable
-                    #>
+"                           $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+
+foreach ($paramDef in ($propertyData | Where-Object { $_.Required -eq 'Key' })) {
+    "                           $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+foreach ($paramDef in ($propertyData | Where-Object { $_.Required -eq 'Mandatory' })) {
+    "                           $($paramDef.Name.PadRight($padSize)) = $($paramDef.EmptyValue)"
+}
+"                           $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+%>
+                    }
                 }
 
                 BeforeEach {
@@ -365,46 +469,28 @@ InModuleScope $ProjectName {
 
                 It 'Should call the correct mocks' {
                     { $script:instanceDesiredState.Set() } | Should -Not -Throw
-
-                    <#
-                        Replace by your command
-                    Assert-MockCalled -CommandName Remove-### -Exactly -Times 1 -Scope 'It'
-                    #>
+                    Assert-MockCalled -CommandName Get-DnsServerResourceRecord -Exactly -Times 1 -Scope 'It'
+                    Assert-MockCalled -CommandName Remove-DnsServerResourceRecord -Exactly -Times 1 -Scope 'It'
                 }
             }
 
             Context 'When the configuration should be present' {
                 BeforeAll {
-                    $script:instanceDesiredState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                    $script:instanceDesiredState.Name = $script:mockItemName
+                    $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
-                    #Override Get() method
-                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
-                        -Value {
-                            $mockInstanceCurrentState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                            $mockInstanceCurrentState.Name = $script:mockItemName
-                            $mockInstanceCurrentState.Ensure = [Ensure]::Absent
-                            $mockInstanceCurrentState.Reasons += [Reason]@{
-                                Code = '{0}:{0}:Ensure' -f $this.GetType()
-                                Phrase = ''
-                            }
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
-                            return $mockInstanceCurrentState
-                        }
-                    # Replace by dummyObject
-                    $script:mockItem     = [pscustomobject]@{
-                        Name                       = $script:mockItemName
-                        PropertyMandatory          = $false
-                        PropertyBoolReadWrite      = $false
+"                        $('ZoneName'.PadRight($padSize)) = `$ZoneName"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+"                        $('TimeToLive'.PadRight($padSize)) = '1:00:00'"
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+%>
                     }
-
-
-                    Mock -CommandName Get-DummyObject
-                    Mock -CommandName New-Object -ParameterFilter {
-                        $Property.Name -eq $script:instanceDesiredState.Name
-                    } -MockWith {
-                        return $script:mockItem
-                    } -Verifiable
                 }
 
                 BeforeEach {
@@ -414,119 +500,8 @@ InModuleScope $ProjectName {
                 It 'Should call the correct mocks' {
                     { $script:instanceDesiredState.Set() } | Should -Not -Throw
 
-                    Assert-MockCalled -CommandName Get-DummyObject -Exactly -Times 0 -Scope 'It'
-                    Assert-MockCalled -CommandName New-Object -ParameterFilter {
-                        $Property.Name -eq $script:instanceDesiredState.Name
-                    } -Exactly -Times 1 -Scope 'It'
-
-
-                    Assert-MockCalled -CommandName Set-HelpFunctionProperty  -ParameterFilter {
-                        $Property -eq 'PropertyMandatory'
-                    } -Exactly -Times 1 -Scope 'It'
-
-                    Assert-MockCalled -CommandName Set-HelpFunctionProperty  -ParameterFilter {
-                        $Property -eq 'PropertyBoolReadWrite'
-                    } -Exactly -Times 1 -Scope 'It'
-
-                }
-            }
-
-            Context 'When the configuration is present but has the wrong properties' {
-                BeforeAll {
-                    $script:instanceDesiredState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                    $script:instanceDesiredState.Name = $script:mockItemName
-
-                    $script:mockItem     = [pscustomobject]@{
-                        Name                       = $script:mockItemName
-                        PropertyMandatory          = $false
-                        PropertyBoolReadWrite      = $false
-                    }
-
-                    Mock -CommandName New-Object
-                    Mock -CommandName Get-DummyObject -ParameterFilter {
-                        $Property.Name -eq $script:instance.Name
-                    } -MockWith {
-                        return $script:mockItem
-                    } -Verifiable
-                }
-
-                BeforeEach {
-                    $script:instanceDesiredState.Ensure = 'Present'
-                }
-
-                $testCase = @(
-                    @{
-                        PropertyMandatory  = $true
-                        PropertyBoolReadWrite    = $false
-                        PropertyBoolReadOnly    = $false
-                        PropertyStringReadOnly = $null
-                    },
-                    @{
-                        PropertyMandatory  = $false
-                        PropertyBoolReadWrite    = $true
-                        PropertyBoolReadOnly    = $false
-                        PropertyStringReadOnly = $null
-                    },
-                    @{
-                        PropertyMandatory  = $false
-                        PropertyBoolReadWrite    = $false
-                        PropertyBoolReadOnly    = $true
-                        PropertyStringReadOnly = 'Test'
-                    }
-                )
-
-                It 'Should call the correct mocks when PropertyMandatory is <PropertyMandatory>, and PropertyBoolReadWrite is <PropertyBoolReadWrite>' -TestCases $testCase {
-                    param
-                    (
-                        [System.Boolean]
-                        $PropertyMandatory,
-
-                        [System.Boolean]
-                        $PropertyBoolReadWrite,
-
-                        [System.Boolean]
-                        $PropertyBoolReadOnly,
-
-                        [System.String]
-                        $PropertyStringReadOnly
-                    )
-
-                    #Override Get() method
-                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
-                        -Value {
-                            $mockInstanceCurrentState = [DSC_<%=$PLASTER_PARAM_ResourceName %>]::New()
-                            $mockInstanceCurrentState.Name = $script:mockItemName
-                            $mockInstanceCurrentState.Ensure = [Ensure]::Present
-                            $mockInstanceCurrentState.PropertyMandatory = $PropertyMandatory
-                            $mockInstanceCurrentState.PropertyBoolReadWrite = $PropertyBoolReadWrite
-                            $mockInstanceCurrentState.PropertyBoolReadOnly = $PropertyBoolReadOnly
-                            $mockInstanceCurrentState.PropertyStringReadOnly = $PropertyStringReadOnly
-
-                            return $mockInstanceCurrentState
-                        }
-
-                    $script:instanceDesiredState.PropertyMandatory = $false
-                    $script:instanceDesiredState.PropertyBoolReadWrite = $false
-
-                    { $script:instanceDesiredState.Set() } | Should -Not -Throw
-
-                    Assert-MockCalled -CommandName New-Object -Exactly -Times 0 -Scope 'It'
-                    Assert-MockCalled -CommandName Get-DummyObject -Exactly -Times 1 -Scope 'It'
-
-
-                    if ($PropertyMandatory)
-                    {
-                        Assert-MockCalled -CommandName Set-HelpFunctionProperty -ParameterFilter {
-                            $Property -eq 'PropertyMandatory'
-                        } -Exactly -Times 1 -Scope 'It'
-                    }
-
-                    if ($PropertyBoolReadWrite)
-                    {
-                        Assert-MockCalled -CommandName Set-HelpFunctionProperty -ParameterFilter {
-                            $Property -eq 'PropertyBoolReadWrite'
-                        } -Exactly -Times 1 -Scope 'It'
-                    }
+                    Assert-MockCalled -CommandName Remove-DnsServerResourceRecord -Exactly -Times 1 -Scope 'It'
+                    Assert-MockCalled -CommandName Add-DnsServerResourceRecord -Exactly -Times 1 -Scope 'It'
                 }
             }
 
