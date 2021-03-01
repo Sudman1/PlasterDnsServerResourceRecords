@@ -9,10 +9,14 @@ Based on Gael Colas' [Sampler ClassResource Template](https://github.com/gaelcol
 
 | Complete | Component |
 |:--------:|-----------|
-|          | Record Class Template |
-|          | Scoped Record Class Template |
+|     x    | Record Class Template |
+|     x    | Scoped Record Class Template |
 |     X    | Localization Strings |
 |     X    | Record Examples |
 |     X    | Scoped Record Examples |
 |          | Unit Tests |
 |          | Scoped Unit Tests |
+|          | Integration Configs |
+|          | Integration Tests |
+|          | Scoped Integration Configs |
+|          | Scoped Integration Tests |
