@@ -61,8 +61,8 @@
             destination='tests/Unit/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}.tests.ps1'
       />
 
-      <!--   tests/Classes/tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template -->
-      <templateFile source='tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template'
+      <!--   tests/Classes/tests/Unit/ClassResource/DSC_ClassResourceScoped.tests.ps1.template -->
+      <templateFile source='tests/Unit/ClassResource/DSC_ClassResourceScoped.tests.ps1.template'
             destination='tests/Unit/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.tests.ps1'
       />
 
@@ -75,7 +75,7 @@
       />
 
       <!--   tests/Classes/tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template -->
-      <templateFile source='tests/Integration/DSC_ClassResource.tests.ps1.template'
+      <templateFile source='tests/Integration/DSC_ClassResourceScoped.tests.ps1.template'
             destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.tests.ps1'
       />
 

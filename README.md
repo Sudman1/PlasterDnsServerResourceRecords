@@ -15,7 +15,7 @@ Based on Gael Colas' [Sampler ClassResource Template](https://github.com/gaelcol
 |     X    | Record Examples |
 |     X    | Scoped Record Examples |
 |     X    | Unit Tests |
-|          | Scoped Unit Tests |
+|     X    | Scoped Unit Tests |
 |          | Integration Configs |
 |          | Integration Tests |
 |          | Scoped Integration Configs |

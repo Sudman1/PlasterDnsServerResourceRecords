@@ -1,0 +1,527 @@
+<#
+    This pester file is an example of how organize a pester test.
+    There tests are based to dummy scenario.
+    Replace all properties, and mock commands by yours.
+#>
+
+$ProjectPath = "$PSScriptRoot\..\..\.." | Convert-Path
+$ProjectName = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
+        ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
+        $(try
+            {
+                Test-ModuleManifest $_.FullName -ErrorAction Stop
+            }
+            catch
+            {
+                $false
+            }) }
+).BaseName
+
+Import-Module $ProjectName
+
+Get-Module -Name 'DnsServer' -All | Remove-Module -Force
+Import-Module -Name "$($PSScriptRoot)\..\Stubs\DnsServer.psm1"
+
+InModuleScope $ProjectName {
+
+    Describe DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped -Tag 'DnsRecord', 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped' {
+
+        Context 'Constructors' {
+            It 'Should not throw an exception when instantiate it' {
+                { [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped]::new() } | Should -Not -Throw
+            }
+
+            It 'Has a default or empty constructor' {
+                $instance = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped]::new()
+                $instance | Should -Not -BeNullOrEmpty
+                $instance.GetType().Name | Should -Be 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped'
+            }
+        }
+
+        Context 'Type creation' {
+            It 'Should be type named DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped' {
+                $instance = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped]::new()
+                $instance.GetType().Name | Should -Be 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped'
+            }
+        }
+    }
+
+    Describe "Testing DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped Get Method" -Tag 'Get', 'DnsRecord', 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped' {
+        BeforeEach {
+            $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                $('ZoneScope'.PadRight($padSize)) = 'external'"
+
+foreach ($paramDef in $propertyData) {
+    "                $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+%>
+            }
+        }
+
+        Context "When the configuration is absent" {
+            BeforeAll {
+                Mock -CommandName Get-DnsServerResourceRecord -MockWith {
+                    Write-Verbose "Mock Get-DnsServerResourceRecord Called" -Verbose
+                }
+            }
+
+            It 'Should return the state as absent' {
+                $currentState = $script:instanceDesiredState.Get()
+
+                Assert-MockCalled Get-DnsServerResourceRecord -Exactly -Times 1 -Scope It
+                $currentState.Ensure | Should -Be 'Absent'
+            }
+
+            It 'Should return the same values as present in Key properties' {
+                $getMethodResourceResult = $script:instanceDesiredState.Get()
+
+                $getMethodResourceResult.ZoneName | Should -Be $script:instanceDesiredState.ZoneName
+                $getMethodResourceResult.ZoneScope | Should -Be $script:instanceDesiredState.ZoneScope
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required -eq 'Key' }
+
+foreach ($paramDef in $propertyData) {
+    "                `$getMethodResourceResult.$($paramDef.Name) | Should -Be `$script:instanceDesiredState.$($paramDef.Name)"
+}
+%>
+            }
+
+            It 'Should return $false or $null respectively for the rest of the non-key properties' {
+                $getMethodResourceResult = $script:instanceDesiredState.Get()
+
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required -ne 'Key' }
+
+foreach ($paramDef in $propertyData) {
+    "                [bool] `$getMethodResourceResult.$($paramDef.Name) | Should -Be $false"
+}
+%>
+                $getMethodResourceResult.TimeToLive | Should -BeNullOrEmpty
+                $getMethodResourceResult.DnsServer | Should -Be 'localhost'
+            }
+        }
+
+        Context "When the configuration is present" {
+            BeforeAll {
+                $mockInstancesPath = Resolve-Path -Path $PSScriptRoot
+
+                Mock -CommandName Get-DnsServerResourceRecord -MockWith {
+                    Write-Verbose "Mock Get-DnsServerResourceRecord Called" -Verbose
+
+                    return Import-Clixml -Path "$($mockInstancesPath)\..\MockObjects\<%= $PLASTER_PARAM_ResourceRecordType %>RecordInstance.xml"
+                }
+            }
+
+            It 'Should return the state as present' {
+                $currentState = $script:instanceDesiredState.Get()
+
+                Assert-MockCalled Get-DnsServerResourceRecord -Exactly -Times 1 -Scope It
+                $currentState.Ensure | Should -Be 'Present'
+            }
+
+            It 'Should return the same values as present in Key properties' {
+                $getMethodResourceResult = $script:instanceDesiredState.Get()
+
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required -eq 'Key' }
+
+foreach ($paramDef in $propertyData) {
+    "                `$getMethodResourceResult.$($paramDef.Name) | Should -Be `$script:instanceDesiredState.$($paramDef.Name)"
+}
+%>
+            }
+        }
+
+    }
+
+    Describe "Testing DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped Test Method" -Tag 'Test', 'DnsRecord', 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped' {
+        BeforeAll {
+        }
+
+        Context 'When the system is in the desired state' {
+            Context 'When the configuration are absent' {
+                BeforeEach {
+                    $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+%>
+                    }
+
+                    #Override Get() method
+                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
+                        -Value {
+                        $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+%>
+                        }
+
+                        return $mockInstanceCurrentState
+                    }
+                }
+
+                It 'Should return $true' {
+                    $script:instanceDesiredState.Test() | Should -BeTrue
+                }
+            }
+
+            Context 'When the configuration are present' {
+                BeforeEach {
+                    $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+%>
+                    }
+
+                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
+                        -Value {
+                        $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+%>
+                        }
+
+                        return $mockInstanceCurrentState
+                    }
+                }
+
+                It 'Should return $true' {
+                    $script:instanceDesiredState.Test() | Should -Be $true
+                }
+            }
+        }
+
+        Context 'When the system is not in the desired state' {
+            Context 'When the configuration should be absent' {
+                BeforeEach {
+                    $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+%>
+                    }
+
+                    #Override Get() method
+                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
+                        -Value {
+                        $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+%>
+                        }
+
+                        return $mockInstanceCurrentState
+                    }
+                }
+                It 'Should return $false' {
+                    $script:instanceDesiredState.Test() | Should -BeFalse
+                }
+            }
+
+            Context 'When the configuration should be present' {
+                BeforeEach {
+                    $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('TimeToLive'.PadRight($padSize)) = '1:00:00'"
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+%>
+                    }
+                }
+
+                It 'Should return $false when the object is not found' {
+                    #Override Get() method
+                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
+                        -Value {
+                        $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+%>
+                        }
+
+                        return $mockInstanceCurrentState
+                    }
+                    $script:instanceDesiredState.Test() | Should -BeFalse
+                }
+
+
+                $testCasesToFail = @(
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+foreach ($nonKeyProp in ($propertyData | Where-Object { $_.Required -ne 'Key'})) {
+    "                    @{"
+    "                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+    "                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+
+    foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+        "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+    }
+
+    foreach ($paramDef in ($propertyData | Where-Object {$_.Required -ne 'Key'})) {
+        if ($paramDef.Name -eq $nonKeyProp.Name) {
+            "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleUndesiredValue) # Undesired"
+        } else {
+            "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+        }
+    }
+
+    "                        $('DnsServer'.PadRight($padSize)) = 'localhost'"
+    "                        $('TimeToLive'.PadRight($padSize)) = '01:00:00'"
+    "                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+    "                    },"
+}
+%>
+                    @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+"                        $('DnsServer'.PadRight($padSize)) = 'localhost'"
+"                        $('TimeToLive'.PadRight($padSize)) = '02:00:00' # Undesired"
+"                        $('Ensure'.PadRight($padSize)) = 'Present'"
+%>
+                    }
+                )
+
+                It 'Should return $false when non-key values are not in the desired state.' -TestCases $testCasesToFail {
+                    param
+                    (
+                        [System.String] $ZoneName,
+                        [System.String] $ZoneScope,
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+foreach ($paramDef in $propertyData) {
+    "                        [$($paramDef.ObjectType)] $($paramDef.Name),"
+}
+%>
+                        [System.String] $TimeToLive
+                    )
+                    #Override Get() method
+                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
+                        -Value {
+                        $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                           $('ZoneName'.PadRight($padSize)) = `$ZoneName"
+"                           $('ZoneScope'.PadRight($padSize)) = `$ZoneScope"
+
+foreach ($paramDef in $propertyData) {
+    "                           $($paramDef.Name.PadRight($padSize)) = `$$($paramDef.Name)"
+}
+
+"                           $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+%>
+                        }
+
+                        return $mockInstanceCurrentState
+                    }
+
+                    $script:instanceDesiredState.Test() | Should -BeFalse
+                }
+            }
+        }
+    }
+
+    Describe "Testing DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped Set Method" -Tag 'Set', 'DnsRecord', 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped' {
+        BeforeAll {
+            # Mock the Add-DnsServerResourceRecord cmdlet to return nothing
+            Mock -CommandName Add-DnsServerResourceRecord -MockWith {
+                Write-Verbose "Mock Add-DnsServerResourceRecord Called" -Verbose
+            } -Verifiable
+
+            # Mock the Remove-DnsServerResourceRecord cmdlet to return nothing
+            Mock -CommandName Remove-DnsServerResourceRecord -MockWith {
+                Write-Verbose "Mock Remove-DnsServerResourceRecord Called" -Verbose
+            } -Verifiable
+        }
+
+        Context 'When the system is not in the desired state' {
+            BeforeAll {
+                $mockInstancesPath = Resolve-Path -Path $PSScriptRoot
+
+                Mock -CommandName Get-DnsServerResourceRecord -MockWith {
+                    Write-Verbose "Mock Get-DnsServerResourceRecord Called" -Verbose
+
+                    $mockRecord = Import-Clixml -Path "$($mockInstancesPath)\..\MockObjects\<%= $PLASTER_PARAM_ResourceRecordType %>RecordInstance.xml"
+
+                    # Set a wrong value
+                    $mockRecord.TimeToLive = [System.TimeSpan] '2:00:00'
+
+                    return $mockRecord
+                }
+            }
+
+            Context 'When the configuration should be absent' {
+                BeforeAll {
+                    $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                           $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                           $('ZoneScope'.PadRight($padSize)) = 'external'"
+
+foreach ($paramDef in ($propertyData | Where-Object { $_.Required -eq 'Key' })) {
+    "                           $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+foreach ($paramDef in ($propertyData | Where-Object { $_.Required -eq 'Mandatory' })) {
+    "                           $($paramDef.Name.PadRight($padSize)) = $($paramDef.EmptyValue)"
+}
+"                           $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+%>
+                    }
+                }
+
+                BeforeEach {
+                    $script:instanceDesiredState.Ensure = [Ensure]::Absent
+                }
+
+                It 'Should call the correct mocks' {
+                    { $script:instanceDesiredState.Set() } | Should -Not -Throw
+                    Assert-MockCalled -CommandName Get-DnsServerResourceRecord -Exactly -Times 1 -Scope 'It'
+                    Assert-MockCalled -CommandName Remove-DnsServerResourceRecord -Exactly -Times 1 -Scope 'It'
+                }
+            }
+
+            Context 'When the configuration should be present' {
+                BeforeAll {
+                    $script:instanceDesiredState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"                        $('ZoneName'.PadRight($padSize)) = `$ZoneName"
+"                        $('ZoneScope'.PadRight($padSize)) = `ZoneScope"
+
+foreach ($paramDef in $propertyData) {
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+"                        $('TimeToLive'.PadRight($padSize)) = '1:00:00'"
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+%>
+                    }
+                }
+
+                BeforeEach {
+                    $script:instanceDesiredState.Ensure = 'Present'
+                }
+
+                It 'Should call the correct mocks' {
+                    { $script:instanceDesiredState.Set() } | Should -Not -Throw
+
+                    Assert-MockCalled -CommandName Remove-DnsServerResourceRecord -Exactly -Times 1 -Scope 'It'
+                    Assert-MockCalled -CommandName Add-DnsServerResourceRecord -Exactly -Times 1 -Scope 'It'
+                }
+            }
+
+            Assert-VerifiableMock
+        }
+    }
+}
