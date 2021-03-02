@@ -69,15 +69,33 @@
       <!--   tests/Integration/Classes Folder -->
       <file source='' destination='tests/Integration/Classes' />
 
-      <!--   tests/Classes/tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template -->
-      <templateFile source='tests/Integration/DSC_ClassResource.tests.ps1.template'
-            destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}.tests.ps1'
+      <!--   tests/Integration/DSC_ClassResource.config.ps1.template -->
+      <templateFile source='tests/Integration/DSC_ClassResource.config.ps1.template'
+            destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}.config.ps1'
       />
 
-      <!--   tests/Classes/tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template -->
-      <templateFile source='tests/Integration/DSC_ClassResourceScoped.tests.ps1.template'
-            destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.tests.ps1'
+      <!--   tests/Integration/DSC_ClassResourceScoped.config.ps1.template -->
+      <templateFile source='tests/Integration/DSC_ClassResourceScoped.config.ps1.template'
+            destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.config.ps1'
       />
+
+      <!--   tests/Integration/DSC_ClassResource.tests.ps1.template -->
+      <templateFile source='tests/Integration/DSC_ClassResource.integration.tests.ps1.template'
+            destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}.integration.tests.ps1'
+      />
+
+      <!--   tests/Integration/DSC_ClassResource.tests.ps1.template -->
+      <templateFile source='tests/Integration/DSC_ClassResource.integration.tests.ps1.template'
+            destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.integration.tests.ps1'
+      />
+
+      <!--   replace DnsRecordXXXX with DnsRecordXXXScoped in the scoped tests doc-->
+      <modify path='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.integration.tests.ps1'>
+            <replace condition="$PLASTER_FileContent -notmatch 'DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped'">
+                  <original expand='true'>DnsRecord$($PLASTER_PARAM_ResourceRecordType)</original>
+                  <substitute expand='true'>DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped</substitute>
+            </replace>
+      </modify>
 
       <!--   source/Examples/Resources/DnsRecordXXX Folder -->
       <file source='' destination='source/Examples/Resources/DnsRecord${PLASTER_PARAM_ResourceRecordType}' />
@@ -96,7 +114,6 @@
       <templateFile source='examples/3-DnsRecord_Remove_config.ps1'
             destination='source/Examples/Resources/DnsRecord${PLASTER_PARAM_ResourceRecordType}/3-DnsRecord${PLASTER_PARAM_ResourceRecordType}_Remove_config.ps1'
       />
-
 
       <!--   source/Examples/Resources/DnsRecordXXXScoped Folder -->
       <file source='' destination='source/Examples/Resources/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped' />
