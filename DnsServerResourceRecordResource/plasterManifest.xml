@@ -44,13 +44,13 @@
       />
 
       <!--   source/en-US/DnsRecordResource.strings.pd1 file -->
-      <templateFile source='en-US/DnsServerRecordResource.strings.psd1.template'
-            destination='source/en-US/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}.strings.psd1'
+      <templateFile source='en-US/DnsRecordResource.strings.psd1.template'
+            destination='source/en-US/DnsRecord${PLASTER_PARAM_ResourceRecordType}.strings.psd1'
       />
 
       <!--   source/en-US/DnsRecordResource.strings.pd1 file -->
-      <templateFile source='en-US/DnsServerRecordResource.strings.psd1.template'
-            destination='source/en-US/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.strings.psd1'
+      <templateFile source='en-US/DnsRecordResource.strings.psd1.template'
+            destination='source/en-US/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped.strings.psd1'
       />
 
       <!--   tests/Unit/Classes Folder -->
@@ -58,12 +58,12 @@
 
       <!--   tests/Classes/tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template -->
       <templateFile source='tests/Unit/ClassResource/DSC_ClassResource.tests.ps1.template'
-            destination='tests/Unit/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}.tests.ps1'
+            destination='tests/Unit/Classes/DnsRecord${PLASTER_PARAM_ResourceRecordType}.tests.ps1'
       />
 
       <!--   tests/Classes/tests/Unit/ClassResource/DSC_ClassResourceScoped.tests.ps1.template -->
       <templateFile source='tests/Unit/ClassResource/DSC_ClassResourceScoped.tests.ps1.template'
-            destination='tests/Unit/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.tests.ps1'
+            destination='tests/Unit/Classes/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped.tests.ps1'
       />
 
       <!--   tests/Integration/Classes Folder -->
@@ -71,26 +71,26 @@
 
       <!--   tests/Integration/DSC_ClassResource.config.ps1.template -->
       <templateFile source='tests/Integration/DSC_ClassResource.config.ps1.template'
-            destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}.config.ps1'
+            destination='tests/Integration/Classes/DnsRecord${PLASTER_PARAM_ResourceRecordType}.config.ps1'
       />
 
       <!--   tests/Integration/DSC_ClassResourceScoped.config.ps1.template -->
       <templateFile source='tests/Integration/DSC_ClassResourceScoped.config.ps1.template'
-            destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.config.ps1'
+            destination='tests/Integration/Classes/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped.config.ps1'
       />
 
       <!--   tests/Integration/DSC_ClassResource.tests.ps1.template -->
       <templateFile source='tests/Integration/DSC_ClassResource.integration.tests.ps1.template'
-            destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}.integration.tests.ps1'
+            destination='tests/Integration/Classes/DnsRecord${PLASTER_PARAM_ResourceRecordType}.integration.tests.ps1'
       />
 
       <!--   tests/Integration/DSC_ClassResource.tests.ps1.template -->
       <templateFile source='tests/Integration/DSC_ClassResource.integration.tests.ps1.template'
-            destination='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.integration.tests.ps1'
+            destination='tests/Integration/Classes/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped.integration.tests.ps1'
       />
 
       <!--   replace DnsRecordXXXX with DnsRecordXXXScoped in the scoped tests doc-->
-      <modify path='tests/Integration/Classes/DnsServerRecord${PLASTER_PARAM_ResourceRecordType}Scoped.integration.tests.ps1'>
+      <modify path='tests/Integration/Classes/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped.integration.tests.ps1'>
             <replace condition="$PLASTER_FileContent -notmatch 'DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped'">
                   <original expand='true'>DnsRecord$($PLASTER_PARAM_ResourceRecordType)</original>
                   <substitute expand='true'>DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped</substitute>
