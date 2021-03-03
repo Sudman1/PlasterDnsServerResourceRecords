@@ -90,6 +90,11 @@ configuration DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_CreateR
             Name = $zoneName
         }
 
+        xDnsServerZoneScope "external scope" {
+            ZoneName = $zoneName
+            Name = $zoneScope
+        }
+
         DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped 'Integration_Test'
         {
 <%
@@ -125,6 +130,11 @@ configuration DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_ModifyR
         xDnsServerPrimaryZone "Zone $zoneName"
         {
             Name = $zoneName
+        }
+
+        xDnsServerZoneScope "external scope" {
+            ZoneName = $zoneName
+            Name = $zoneScope
         }
 
         DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped 'Integration_Test'
@@ -170,6 +180,11 @@ configuration DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_DeleteR
         xDnsServerPrimaryZone "Zone $zoneName"
         {
             Name = $zoneName
+        }
+
+        xDnsServerZoneScope "external scope" {
+            ZoneName = $zoneName
+            Name = $zoneScope
         }
 
         DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped 'Integration_Test'
