@@ -1,4 +1,5 @@
-$zoneName = "srv.test"
+$zoneName = "<%= $($PLASTER_PARAM_ResourceRecordType) %>.test"
+$zoneScope = 'external'
 
 $ConfigurationData = @{
     AllNodes    = , @{
@@ -6,45 +7,79 @@ $ConfigurationData = @{
         CertificateFile = $Null
     }
     NonNodeData = @{
-        DnsRecordSrv_CreateRecord_Config = @{
-            ZoneName     = $zoneName
-            SymbolicName = 'dummy'
-            Port         = '33179'
-            Target       = 'dummy.contoso.com'
-            Priority     = 10
-            Weight       = 20
-            Protocol     = 'tcp'
+        DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_CreateRecord_Config = @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"            $('ZoneName'.PadRight($padSize)) = `$zoneName"
+"            $('ZoneScope'.PadRight($padSize)) = `$zoneScope"
+
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+    "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+    "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+%>
         }
-        DnsRecordSrv_ModifyRecord_Config = @{
-            ZoneName     = $zoneName
-            SymbolicName = 'dummy'
-            Port         = '33179'
-            Target       = 'dummy.contoso.com'
-            Weight       = '100'
-            Priority     = '200'
-            DnsServer    = 'localhost'
-            TimeToLive   = '05:00:00'
-            Protocol     = 'tcp'
-            Ensure       = 'Present'
+        DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_ModifyRecord_Config = @{
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"            $('ZoneName'.PadRight($padSize)) = `$zoneName"
+"            $('ZoneScope'.PadRight($padSize)) = `$zoneScope"
+
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+    "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+    "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleUndesiredValue)"
+}
+
+foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
+    "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleUndesiredValue)"
+}
+
+"            $('DnsServer'.PadRight($padSize)) = 'localhost'"
+"            $('TimeToLive'.PadRight($padSize)) = '05:00:00'"
+"            $('Ensure'.PadRight($padSize)) = 'Present'"
+%>
         }
         DnsRecordSrv_DeleteRecord_Config = @{
-            ZoneName     = $zoneName
-            SymbolicName = 'dummy'
-            Port         = '33179'
-            Target       = 'dummy.contoso.com'
-            Protocol     = 'tcp'
-            Priority     = 0
-            Weight       = 0
-            Ensure       = 'Absent'
+
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"            $('ZoneName'.PadRight($padSize)) = `$zoneName"
+"            $('ZoneScope'.PadRight($padSize)) = `$zoneScope"
+
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+    "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+}
+
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+    "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.EmptyValue)"
+}
+
+"            $('Ensure'.PadRight($padSize)) = 'Absent'"
+%>
         }
     }
 }
 
 <#
     .SYNOPSIS
-        Create an SRV record
+        Create an <%= $($PLASTER_PARAM_ResourceRecordType) %> record
 #>
-configuration DnsRecordSrv_CreateRecord_Config
+configuration DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_CreateRecord_Config
 {
     Import-DscResource -ModuleName 'xDnsServer'
 
@@ -55,24 +90,33 @@ configuration DnsRecordSrv_CreateRecord_Config
             Name = $zoneName
         }
 
-        DnsRecordSrv 'Integration_Test'
+        DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped 'Integration_Test'
         {
-            ZoneName     = $ConfigurationData.NonNodeData.DnsRecordSrv_CreateRecord_Config.ZoneName
-            SymbolicName = $ConfigurationData.NonNodeData.DnsRecordSrv_CreateRecord_Config.SymbolicName
-            Protocol     = $ConfigurationData.NonNodeData.DnsRecordSrv_CreateRecord_Config.Protocol
-            Port         = $ConfigurationData.NonNodeData.DnsRecordSrv_CreateRecord_Config.Port
-            Target       = $ConfigurationData.NonNodeData.DnsRecordSrv_CreateRecord_Config.Target
-            Priority     = $ConfigurationData.NonNodeData.DnsRecordSrv_CreateRecord_Config.Priority
-            Weight       = $ConfigurationData.NonNodeData.DnsRecordSrv_CreateRecord_Config.Weight
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"            $('ZoneName'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_CreateRecord_Config.ZoneName"
+"            $('ZoneScope'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_CreateRecord_Config.ZoneScope"
+
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+"            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_CreateRecord_Config.$($paramDef.Name)"
+}
+
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+"            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_CreateRecord_Config.$($paramDef.Name)"
+}
+%>
         }
     }
 }
 
 <#
     .SYNOPSIS
-        Add TimeToLive, Priority, and Weight to an existing SRV record
+        Modifies an existing <%= $($PLASTER_PARAM_ResourceRecordType) %> record
 #>
-configuration DnsRecordSrv_ModifyRecord_Config
+configuration DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_ModifyRecord_Config
 {
     Import-DscResource -ModuleName 'xDnsServer'
 
@@ -83,27 +127,41 @@ configuration DnsRecordSrv_ModifyRecord_Config
             Name = $zoneName
         }
 
-        DnsRecordSrv 'Integration_Test'
+        DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped 'Integration_Test'
         {
-            ZoneName     = $ConfigurationData.NonNodeData.DnsRecordSrv_ModifyRecord_Config.ZoneName
-            SymbolicName = $ConfigurationData.NonNodeData.DnsRecordSrv_ModifyRecord_Config.SymbolicName
-            Protocol     = $ConfigurationData.NonNodeData.DnsRecordSrv_ModifyRecord_Config.Protocol
-            Port         = $ConfigurationData.NonNodeData.DnsRecordSrv_ModifyRecord_Config.Port
-            Target       = $ConfigurationData.NonNodeData.DnsRecordSrv_ModifyRecord_Config.Target
-            Priority     = $ConfigurationData.NonNodeData.DnsRecordSrv_ModifyRecord_Config.Priority
-            Weight       = $ConfigurationData.NonNodeData.DnsRecordSrv_ModifyRecord_Config.Weight
-            TimeToLive   = $ConfigurationData.NonNodeData.DnsRecordSrv_ModifyRecord_Config.TimeToLive
-            DnsServer    = $ConfigurationData.NonNodeData.DnsRecordSrv_ModifyRecord_Config.DnsServer
-            Ensure       = $ConfigurationData.NonNodeData.DnsRecordSrv_ModifyRecord_Config.Ensure
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"            $('ZoneName'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.ZoneName"
+"            $('ZoneScope'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.ZoneScope"
+
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+"            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.$($paramDef.Name)"
+}
+
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+"            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.$($paramDef.Name)"
+}
+
+foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
+"            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.$($paramDef.Name)"
+}
+
+"            $('DnsServer'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.DnsServer"
+"            $('TimeToLive'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.TimeToLive"
+"            $('Ensure'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.Ensure"
+%>
         }
     }
 }
 
 <#
     .SYNOPSIS
-        Deletes an existing SRV record
+        Deletes an existing <%= $($PLASTER_PARAM_ResourceRecordType) %> record
 #>
-configuration DnsRecordSrv_DeleteRecord_Config
+configuration DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_DeleteRecord_Config
 {
     Import-DscResource -ModuleName 'xDnsServer'
 
@@ -114,18 +172,25 @@ configuration DnsRecordSrv_DeleteRecord_Config
             Name = $zoneName
         }
 
-        DnsRecordSrv 'Integration_Test'
+        DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped 'Integration_Test'
         {
-            ZoneName     = $ConfigurationData.NonNodeData.DnsRecordSrv_DeleteRecord_Config.ZoneName
-            SymbolicName = $ConfigurationData.NonNodeData.DnsRecordSrv_DeleteRecord_Config.SymbolicName
-            Protocol     = $ConfigurationData.NonNodeData.DnsRecordSrv_DeleteRecord_Config.Protocol
-            Port         = $ConfigurationData.NonNodeData.DnsRecordSrv_DeleteRecord_Config.Port
-            Target       = $ConfigurationData.NonNodeData.DnsRecordSrv_DeleteRecord_Config.Target
-            Priority     = $ConfigurationData.NonNodeData.DnsRecordSrv_DeleteRecord_Config.Priority
-            Weight       = $ConfigurationData.NonNodeData.DnsRecordSrv_DeleteRecord_Config.Weight
-            TimeToLive   = $ConfigurationData.NonNodeData.DnsRecordSrv_DeleteRecord_Config.TimeToLive
-            DnsServer    = $ConfigurationData.NonNodeData.DnsRecordSrv_DeleteRecord_Config.DnsServer
-            Ensure       = $ConfigurationData.NonNodeData.DnsRecordSrv_DeleteRecord_Config.Ensure
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+$padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"            $('ZoneName'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_DeleteRecord_Config.ZoneName"
+"            $('ZoneScope'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_DeleteRecord_Config.ZoneScope"
+
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+"            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_DeleteRecord_Config.$($paramDef.Name)"
+}
+
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+"            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_DeleteRecord_Config.$($paramDef.Name)"
+}
+"            $('Ensure'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_DeleteRecord_Config.Ensure"
+%>
         }
     }
 }

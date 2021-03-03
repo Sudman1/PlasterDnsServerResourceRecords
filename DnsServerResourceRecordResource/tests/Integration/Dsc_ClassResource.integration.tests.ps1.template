@@ -72,21 +72,28 @@ try
                 # Key properties
                 $resourceCurrentState.ZoneName | Should -Be $shouldBeData.ZoneName
                 $resourceCurrentState.ZoneScope | Should -Be $shouldBeData.ZoneScope
-                $resourceCurrentState.SymbolicName | Should -Be $shouldBeData.SymbolicName
-                $resourceCurrentState.Protocol | Should -Be $shouldBeData.Protocol
-                $resourceCurrentState.Port | Should -Be $shouldBeData.Port
-                $resourceCurrentState.Target | Should -Be $shouldBeData.Target
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
-                # Mandatory properties
-                $resourceCurrentState.Priority | Should -Be $shouldBeData.Priority
-                $resourceCurrentState.Weight | Should -Be $shouldBeData.Weight
-
-                # Optional properties were not specified, so we just need to ensure the value exists
-                $resourceCurrentState.TimeToLive | Should -Not -Be $null
-
-                # Defaulted properties
-                $resourceCurrentState.DnsServer | Should -Be 'localhost'
-                $resourceCurrentState.Ensure | Should -Be 'Present'
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+"                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+}
+""
+"                # Mandatory properties"
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+"                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+}
+""
+"                # Optional properties were not specified, so we just need to ensure the value exists"
+foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
+"                `$resourceCurrentState.$($paramDef.Name) | Should -Not -Be `$null"
+}
+"                `$resourceCurrentState.TimeToLive | Should -Not -Be `$null"
+""
+"                # Defaulted properties"
+"                `$resourceCurrentState.DnsServer | Should -Be 'localhost'"
+"                `$resourceCurrentState.Ensure | Should -Be 'Present'"
+%>
             }
 
             It 'Should return $true when Test-DscConfiguration is run' {
@@ -135,21 +142,28 @@ try
                 # Key properties
                 $resourceCurrentState.ZoneName | Should -Be $shouldBeData.ZoneName
                 $resourceCurrentState.ZoneScope | Should -Be $shouldBeData.ZoneScope
-                $resourceCurrentState.SymbolicName | Should -Be $shouldBeData.SymbolicName
-                $resourceCurrentState.Protocol | Should -Be $shouldBeData.Protocol
-                $resourceCurrentState.Port | Should -Be $shouldBeData.Port
-                $resourceCurrentState.Target | Should -Be $shouldBeData.Target
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
-                # Mandatory properties
-                $resourceCurrentState.Priority | Should -Be $shouldBeData.Priority
-                $resourceCurrentState.Weight | Should -Be $shouldBeData.Weight
-
-                # Optional properties
-                $resourceCurrentState.TimeToLive | Should -Be $shouldBeData.TimeToLive
-
-                # Defaulted properties
-                $resourceCurrentState.DnsServer | Should -Be $shouldBeData.DnsServer
-                $resourceCurrentState.Ensure | Should -Be $shouldBeData.Ensure
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+"                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+}
+""
+"                # Mandatory properties"
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+"                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+}
+""
+"                # Optional properties"
+foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
+"                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+}
+"                `$resourceCurrentState.TimeToLive | Should -Be `$shouldBeData.TimeToLive"
+""
+"                # Defaulted properties"
+"                `$resourceCurrentState.DnsServer | Should -Be `$shouldBeData.DnsServer"
+"                `$resourceCurrentState.Ensure | Should -Be `$shouldBeData.Ensure"
+%>
             }
 
             It 'Should return $true when Test-DscConfiguration is run' {
@@ -198,26 +212,44 @@ try
                 # Key properties
                 $resourceCurrentState.ZoneName | Should -Be $shouldBeData.ZoneName
                 $resourceCurrentState.ZoneScope | Should -Be $shouldBeData.ZoneScope
-                $resourceCurrentState.SymbolicName | Should -Be $shouldBeData.SymbolicName
-                $resourceCurrentState.Protocol | Should -Be $shouldBeData.Protocol
-                $resourceCurrentState.Port | Should -Be $shouldBeData.Port
-                $resourceCurrentState.Target | Should -Be $shouldBeData.Target
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
-                # Mandatory properties
-                $resourceCurrentState.Priority | Should -Be $shouldBeData.Priority
-                $resourceCurrentState.Weight | Should -Be $shouldBeData.Weight
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+"                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+}
 
-                # Optional properties
-                if ($shouldBeData.TimeToLive)
+""
+"                # Mandatory properties"
+foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+"                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+}
+
+""
+"                # Optional properties"
+foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
+@"
+if (`$shouldBeData.$($paramDef.Name))
+{
+                    `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)
+}
+
+"@
+}
+
+@"
+                if (`$shouldBeData.TimeToLive)
                 {
-                    $resourceCurrentState.TimeToLive | Should -Be $shouldBeData.TimeToLive
+                    `$resourceCurrentState.TimeToLive | Should -Be `$shouldBeData.TimeToLive
                 }
 
+"@
+%>
                 # DnsServer is not specified in this test, so it defaults to 'localhost'
                 $resourceCurrentState.DnsServer | Should -Be 'localhost'
 
                 # Ensure will be Absent
-                $resourceCurrentState.Ensure | Should -Be $shouldBeData.Ensure
+                $resourceCurrentState.Ensure | Should -Be 'Absent'
             }
 
             It 'Should return $true when Test-DscConfiguration is run' {
