@@ -48,7 +48,7 @@ foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
 "            $('Ensure'.PadRight($padSize)) = 'Present'"
 %>
         }
-        DnsRecordSrv_DeleteRecord_Config = @{
+        DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>_DeleteRecord_Config = @{
 
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
