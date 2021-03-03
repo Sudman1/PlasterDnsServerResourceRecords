@@ -380,7 +380,7 @@ foreach ($paramDef in $propertyData) {
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
 foreach ($paramDef in $propertyData) {
-    "                        [$($paramDef.ObjectType)] $($paramDef.Name),"
+    "                        [$($paramDef.ObjectType)] `$$($paramDef.Name),"
 }
 %>
                         [System.String] $TimeToLive
