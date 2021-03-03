@@ -19,7 +19,7 @@ Rather than specify each aspect of each property interactively or at the command
 |     X    | Scoped Record Examples |
 |     X    | Unit Tests |
 |     X    | Scoped Unit Tests |
-|          | Integration Configs |
-|          | Integration Tests |
-|          | Scoped Integration Configs |
-|          | Scoped Integration Tests |
+|     X    | Integration Configs |
+|     X    | Integration Tests |
+|     X    | Scoped Integration Configs |
+|     X    | Scoped Integration Tests |
