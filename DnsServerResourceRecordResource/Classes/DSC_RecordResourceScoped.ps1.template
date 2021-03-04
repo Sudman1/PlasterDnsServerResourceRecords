@@ -53,12 +53,13 @@ class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped : DnsRecord<%= $PL
     hidden [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] NewDscResourceObjectFromRecord([ciminstance] $record)
     {
         $dscResourceObject = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
-            ZoneName     = $this.ZoneName
-            ZoneScope    = $this.ZoneScope
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
 $padsize = [Math]::Max('TimeToLive'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
+
+"            $('ZoneName'.PadRight($padSize)) = `$this.ZoneName"
+"            $('ZoneScope'.PadRight($padSize)) = `$this.ZoneScope"
 
 foreach ($paramDef in ($propertyData | Where-Object { $_.Required -eq 'Key' })) {
     "            $($paramDef.Name.PadRight($padSize)) = `$this.$($paramDef.Name)"
@@ -73,10 +74,11 @@ foreach ($paramDef in ($propertyData | Where-Object { $_.Required -eq 'Mandatory
 foreach ($paramDef in ($propertyData | Where-Object { -not $_.Required })) {
     "            $($paramDef.Name.PadRight($padSize)) = throw 'NewDscResourceObjectFromRecord $($paramDef.Name) property not defined'"
 }
+
+"            $('TimeToLive'.PadRight($padSize)) = `$record.TimeToLive.ToString()"
+"            $('DnsServer'.PadRight($padSize)) = `$this.DnsServer"
+"            $('Ensure'.PadRight($padSize)) = 'Present'"
 %>
-            TimeToLive   = $record.TimeToLive.ToString()
-            DnsServer    = $this.DnsServer
-            Ensure       = 'Present'
         }
 
         return $dscResourceObject
