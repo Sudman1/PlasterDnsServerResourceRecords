@@ -84,13 +84,22 @@ class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> : DnsRecordBase
     {
         $dscResourceObject = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
             ZoneName     = $this.ZoneName
-            # Apply values from $record as appropriate below
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
 $padsize = [Math]::Max('TimeToLive'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
-foreach ($paramDef in $propertyData) {
+foreach ($paramDef in ($propertyData | Where-Object { $_.Required -eq 'Key' })) {
+    "            $($paramDef.Name.PadRight($padSize)) = `$this.$($paramDef.Name)"
+}
+
+"            # Apply values from $record as appropriate below"
+
+foreach ($paramDef in ($propertyData | Where-Object { $_.Required -eq 'Mandatory' })) {
+    "            $($paramDef.Name.PadRight($padSize)) = throw 'NewDscResourceObjectFromRecord $($paramDef.Name) property not defined'"
+}
+
+foreach ($paramDef in ($propertyData | Where-Object { -not $_.Required })) {
     "            $($paramDef.Name.PadRight($padSize)) = throw 'NewDscResourceObjectFromRecord $($paramDef.Name) property not defined'"
 }
 %>
