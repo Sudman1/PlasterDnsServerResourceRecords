@@ -79,11 +79,15 @@ foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
 "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
 }
 ""
-"                # Mandatory properties"
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
-"                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+
+if ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+    "                # Mandatory properties"
+    foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+    "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+    }
+    ""
 }
-""
+
 "                # Optional properties were not specified, so we just need to ensure the value exists"
 foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
 "                `$resourceCurrentState.$($paramDef.Name) | Should -Not -Be `$null"
@@ -149,11 +153,15 @@ foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
 "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
 }
 ""
-"                # Mandatory properties"
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
-"                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+
+if ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+    "                # Mandatory properties"
+    foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+    "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+    }
+    ""
 }
-""
+
 "                # Optional properties"
 foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
 "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
@@ -220,12 +228,15 @@ foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
 }
 
 ""
-"                # Mandatory properties"
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
-"                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+
+if ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+    "                # Mandatory properties"
+    foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+    "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
+    }
+    ""
 }
 
-""
 "                # Optional properties"
 foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
 @"

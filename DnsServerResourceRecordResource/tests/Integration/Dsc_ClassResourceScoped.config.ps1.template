@@ -52,7 +52,6 @@ foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
 %>
         }
         DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_DeleteRecord_Config = @{
-
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
@@ -92,7 +91,7 @@ configuration DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_CreateR
 
         xDnsServerZoneScope "external scope" {
             ZoneName = $zoneName
-            Name = $zoneScope
+            Name     = $zoneScope
         }
 
         DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped 'Integration_Test'
@@ -134,7 +133,7 @@ configuration DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_ModifyR
 
         xDnsServerZoneScope "external scope" {
             ZoneName = $zoneName
-            Name = $zoneScope
+            Name     = $zoneScope
         }
 
         DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped 'Integration_Test'
@@ -184,7 +183,7 @@ configuration DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_DeleteR
 
         xDnsServerZoneScope "external scope" {
             ZoneName = $zoneName
-            Name = $zoneScope
+            Name     = $zoneScope
         }
 
         DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped 'Integration_Test'
