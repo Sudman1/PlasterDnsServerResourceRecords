@@ -482,7 +482,7 @@ $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_Resour
 
 $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
-"                        $('ZoneName'.PadRight($padSize)) = `$ZoneName"
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
 
 foreach ($paramDef in $propertyData) {
     "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
