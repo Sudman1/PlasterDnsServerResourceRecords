@@ -118,7 +118,7 @@ foreach ($paramDef in ($propertyData | Where-Object { -not $_.Required })) {
         $dnsParameters = @{
             ZoneName     = $this.ZoneName
             ComputerName = $this.DnsServer
-            <%= $PLASTER_PARAM_ResourceRecordType %>          = $true
+            <%= $PLASTER_PARAM_ResourceRecordType.PadRight('ComputerName'.length) %> = $true
             # Add necessary Add-DnsServerResourceRecord parameters here and remove the throw below
         }
         throw "AddResourceRecord dnsParameters not implemented for $($this.GetType().Name)"
