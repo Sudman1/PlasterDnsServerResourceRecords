@@ -98,11 +98,12 @@ foreach ($paramDef in $propertyData) {
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required -ne 'Key' }
 
-foreach ($paramDef in $propertyData) {
-    "                [bool] `$getMethodResourceResult.$($paramDef.Name) | Should -Be $false"
+if ($propertyData) {
+    foreach ($paramDef in $propertyData) {
+        "                [bool] `$getMethodResourceResult.$($paramDef.Name) | Should -Be $false"
+    }
 }
-%>
-                $getMethodResourceResult.TimeToLive | Should -BeNullOrEmpty
+%>                $getMethodResourceResult.TimeToLive | Should -BeNullOrEmpty
                 $getMethodResourceResult.DnsServer | Should -Be 'localhost'
             }
         }
@@ -165,22 +166,21 @@ foreach ($paramDef in $propertyData) {
                     }
 
                     #Override Get() method
-                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
-                        -Value {
+                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get -Value {
                         $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
 
 $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
-"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
-"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+"                            $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                            $('ZoneScope'.PadRight($padSize)) = 'external'"
 
 foreach ($paramDef in $propertyData) {
-    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+    "                            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
 }
 
-"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+"                            $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
 %>
                         }
 
@@ -210,22 +210,21 @@ foreach ($paramDef in $propertyData) {
 %>
                     }
 
-                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
-                        -Value {
+                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get -Value {
                         $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
 
 $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
-"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
-"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+"                            $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                            $('ZoneScope'.PadRight($padSize)) = 'external'"
 
 foreach ($paramDef in $propertyData) {
-    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+    "                            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
 }
 
-"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+"                            $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
 %>
                         }
 
@@ -260,22 +259,21 @@ foreach ($paramDef in $propertyData) {
                     }
 
                     #Override Get() method
-                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
-                        -Value {
+                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get -Value {
                         $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
 
 $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
-"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
-"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+"                            $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                            $('ZoneScope'.PadRight($padSize)) = 'external'"
 
 foreach ($paramDef in $propertyData) {
-    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+    "                            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
 }
 
-"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
+"                            $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
 %>
                         }
 
@@ -310,22 +308,21 @@ foreach ($paramDef in $propertyData) {
 
                 It 'Should return $false when the object is not found' {
                     #Override Get() method
-                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
-                        -Value {
+                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get -Value {
                         $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
 
 $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
-"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
-"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
+"                            $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                            $('ZoneScope'.PadRight($padSize)) = 'external'"
 
 foreach ($paramDef in $propertyData) {
-    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+    "                            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
 }
 
-"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+"                            $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
 %>
                         }
 
@@ -333,7 +330,6 @@ foreach ($paramDef in $propertyData) {
                     }
                     $script:instanceDesiredState.Test() | Should -BeFalse
                 }
-
 
                 $testCasesToFail = @(
 <%
@@ -363,8 +359,7 @@ foreach ($nonKeyProp in ($propertyData | Where-Object { $_.Required -ne 'Key'}))
     "                        $('Ensure'.PadRight($padSize)) = [Ensure]::Present"
     "                    },"
 }
-%>
-                    @{
+%>                    @{
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
@@ -399,8 +394,7 @@ foreach ($paramDef in $propertyData) {
                         [System.String] $TimeToLive
                     )
                     #Override Get() method
-                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get `
-                        -Value {
+                    $script:instanceDesiredState | Add-Member -Force -MemberType ScriptMethod -Name Get -Value {
                         $mockInstanceCurrentState = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
@@ -464,16 +458,16 @@ $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_Resour
 
 $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
-"                           $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
-"                           $('ZoneScope'.PadRight($padSize)) = 'external'"
+"                        $('ZoneName'.PadRight($padSize)) = 'contoso.com'"
+"                        $('ZoneScope'.PadRight($padSize)) = 'external'"
 
 foreach ($paramDef in ($propertyData | Where-Object { $_.Required -eq 'Key' })) {
-    "                           $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
 }
 foreach ($paramDef in ($propertyData | Where-Object { $_.Required -eq 'Mandatory' })) {
-    "                           $($paramDef.Name.PadRight($padSize)) = $($paramDef.EmptyValue)"
+    "                        $($paramDef.Name.PadRight($padSize)) = $($paramDef.EmptyValue)"
 }
-"                           $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
+"                        $('Ensure'.PadRight($padSize)) = [Ensure]::Absent"
 %>
                     }
                 }
