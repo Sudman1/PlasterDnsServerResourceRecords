@@ -39,7 +39,7 @@ Updated author, copyright notice, and URLs.
         This configuration will ensure a DNS <%= $PLASTER_PARAM_ResourceRecordType %> record exists when only the mandatory properties are specified.
 #>
 
-Configuration DnsRecordSrv_config
+Configuration DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped_Mandatory_config
 {
     Import-DscResource -ModuleName 'xDnsServer'
 

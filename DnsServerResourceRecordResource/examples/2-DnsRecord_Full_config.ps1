@@ -39,7 +39,7 @@ Updated author, copyright notice, and URLs.
         This configuration will ensure a DNS <%= $PLASTER_PARAM_ResourceRecordType %> record exists when all properties are specified.
 #>
 
-Configuration DnsRecordSrv_config
+Configuration DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>_Full_config
 {
     Import-DscResource -ModuleName 'xDnsServer'
 
