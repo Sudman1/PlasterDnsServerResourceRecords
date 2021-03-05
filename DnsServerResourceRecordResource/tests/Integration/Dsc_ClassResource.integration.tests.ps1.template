@@ -226,7 +226,6 @@ $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_Resour
 foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
 "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
 }
-
 ""
 
 if ($propertyData | Where-Object {$_.Required -eq 'Mandatory'}) {

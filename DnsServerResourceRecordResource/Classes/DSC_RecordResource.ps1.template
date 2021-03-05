@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        A DSC Resource for MS DNS Server that represents an <%= $PLASTER_PARAM_ResourceRecordType %> resource record.
+        A DSC Resource for MS DNS Server that represents an <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> resource record.
     .PARAMETER ZoneName
         Specifies the name of a DNS zone. (Key Parameter)
 <%
@@ -13,7 +13,7 @@
     }
 %>
     .PARAMETER TimeToLive
-        Specifies the TimeToLive value of the <%= $PLASTER_PARAM_ResourceRecordType %> record. Value must be in valid TimeSpan string format (i.e.: Days.Hours:Minutes:Seconds.Miliseconds or 30.23:59:59.999).
+        Specifies the TimeToLive value of the <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> record. Value must be in valid TimeSpan string format (i.e.: Days.Hours:Minutes:Seconds.Miliseconds or 30.23:59:59.999).
     .PARAMETER DnsServer
         Name of the DnsServer to create the record on.
     .PARAMETER Ensure
@@ -57,7 +57,7 @@ class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> : DnsRecordBase
         $dnsParameters = @{
             ZoneName     = $this.ZoneName
             ComputerName = $this.DnsServer
-            RRType       = '<%= $PLASTER_PARAM_ResourceRecordType %>'
+            RRType       = '<%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %>'
             # Add necessary Get-DnsServerResourceRecord parameters here and remove the throw below
         }
         throw "GetResourceRecord dnsParameters not implemented for $($this.GetType().Name)"
@@ -120,7 +120,7 @@ if ($propertyData | Where-Object { $_.Required -ne 'Key' }) {
         $dnsParameters = @{
             ZoneName     = $this.ZoneName
             ComputerName = $this.DnsServer
-            <%= $PLASTER_PARAM_ResourceRecordType.PadRight('ComputerName'.length) %> = $true
+            <%= $PLASTER_PARAM_ResourceRecordType.ToUpper().PadRight('ComputerName'.length) %> = $true
             # Add necessary Add-DnsServerResourceRecord parameters here and remove the throw below
         }
         throw "AddResourceRecord dnsParameters not implemented for $($this.GetType().Name)"
@@ -135,7 +135,7 @@ if ($propertyData | Where-Object { $_.Required -ne 'Key' }) {
             $dnsParameters.Add('TimeToLive', $this.TimeToLive)
         }
 
-        Write-Verbose -Message ($script:localizedDataDnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>.CreatingDnsRecordMessage -f '<%= $PLASTER_PARAM_ResourceRecordType %>', $this.ZoneName, $this.ZoneScope, $this.DnsServer)
+        Write-Verbose -Message ($script:localizedDataDnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>.CreatingDnsRecordMessage -f '<%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %>', $this.ZoneName, $this.ZoneScope, $this.DnsServer)
 
         Add-DnsServerResourceRecord @dnsParameters
     }

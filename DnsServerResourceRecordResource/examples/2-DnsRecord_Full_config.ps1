@@ -36,7 +36,7 @@ Updated author, copyright notice, and URLs.
 
 <#
     .DESCRIPTION
-        This configuration will ensure a DNS <%= $PLASTER_PARAM_ResourceRecordType %> record exists when all properties are specified.
+        This configuration will ensure a DNS <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> record exists when all properties are specified.
 #>
 
 Configuration DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>_Full_config

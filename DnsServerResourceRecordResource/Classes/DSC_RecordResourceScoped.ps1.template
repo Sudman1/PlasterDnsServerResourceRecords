@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        A DSC Resource for MS DNS Server that represents an SRV resource record.
+        A DSC Resource for MS DNS Server that represents an <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> resource record.
     .PARAMETER ZoneName
         Specifies the name of a DNS zone. (Key Parameter)
     .PARAMETER ZoneScope

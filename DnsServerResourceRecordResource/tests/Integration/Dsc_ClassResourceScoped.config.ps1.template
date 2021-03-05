@@ -76,7 +76,7 @@ foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'
 
 <#
     .SYNOPSIS
-        Create an <%= $($PLASTER_PARAM_ResourceRecordType) %> record
+        Create an <%= $($PLASTER_PARAM_ResourceRecordType.ToUpper()) %> record
 #>
 configuration DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_CreateRecord_Config
 {
@@ -118,7 +118,7 @@ foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'
 
 <#
     .SYNOPSIS
-        Modifies an existing <%= $($PLASTER_PARAM_ResourceRecordType) %> record
+        Modifies an existing <%= $($PLASTER_PARAM_ResourceRecordType.ToUpper()) %> record
 #>
 configuration DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_ModifyRecord_Config
 {
@@ -168,7 +168,7 @@ foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
 
 <#
     .SYNOPSIS
-        Deletes an existing <%= $($PLASTER_PARAM_ResourceRecordType) %> record
+        Deletes an existing <%= $($PLASTER_PARAM_ResourceRecordType.ToUpper()) %> record
 #>
 configuration DnsRecord<%= $($PLASTER_PARAM_ResourceRecordType) %>Scoped_DeleteRecord_Config
 {

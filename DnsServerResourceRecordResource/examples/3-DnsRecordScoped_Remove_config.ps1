@@ -36,7 +36,7 @@ Updated author, copyright notice, and URLs.
 
 <#
     .DESCRIPTION
-        This configuration will ensure a DNS <%= $PLASTER_PARAM_ResourceRecordType %> record does not exist when mandatory properties are specified.
+        This configuration will ensure a DNS <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> record does not exist when mandatory properties are specified.
 
         Note that not all mandatory properties are necessarily key properties. Non-key property values will be ignored when determining whether the record is to be removed.
 #>
