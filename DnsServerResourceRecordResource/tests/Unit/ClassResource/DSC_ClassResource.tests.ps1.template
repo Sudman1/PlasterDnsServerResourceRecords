@@ -23,18 +23,16 @@ Get-Module -Name 'DnsServer' -All | Remove-Module -Force
 Import-Module -Name "$($PSScriptRoot)\..\Stubs\DnsServer.psm1"
 
 InModuleScope $ProjectName {
-
     Describe DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> -Tag 'DnsRecord', 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>' {
 
         Context 'Constructors' {
-            It 'Should not throw an exception when instantiate it' {
+            It 'Should not throw an exception when instantiated' {
                 { [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>]::new() } | Should -Not -Throw
             }
 
             It 'Has a default or empty constructor' {
                 $instance = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>]::new()
                 $instance | Should -Not -BeNullOrEmpty
-                $instance.GetType().Name | Should -Be 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>'
             }
         }
 

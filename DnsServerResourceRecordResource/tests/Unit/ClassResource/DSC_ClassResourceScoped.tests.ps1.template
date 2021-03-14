@@ -27,14 +27,13 @@ InModuleScope $ProjectName {
     Describe DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped -Tag 'DnsRecord', 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped' {
 
         Context 'Constructors' {
-            It 'Should not throw an exception when instantiate it' {
+            It 'Should not throw an exception when instantiate' {
                 { [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped]::new() } | Should -Not -Throw
             }
 
             It 'Has a default or empty constructor' {
                 $instance = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped]::new()
                 $instance | Should -Not -BeNullOrEmpty
-                $instance.GetType().Name | Should -Be 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped'
             }
         }
 
