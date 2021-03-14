@@ -57,7 +57,7 @@ class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> : DnsRecordBase
         return ([DnsRecordBase] $this).Test()
     }
 
-    hidden [ciminstance] GetResourceRecord()
+    hidden [Microsoft.Management.Infrastructure.CimInstance] GetResourceRecord()
     {
         Write-Verbose -Message ($script:localizedDataDnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>.GettingDnsRecordMessage -f '<%= $PLASTER_PARAM_ResourceRecordType %>', $this.ZoneName, $this.ZoneScope, $this.DnsServer)
 
@@ -87,7 +87,7 @@ class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> : DnsRecordBase
         return $record
     }
 
-    hidden [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] NewDscResourceObjectFromRecord([ciminstance] $record)
+    hidden [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] NewDscResourceObjectFromRecord([Microsoft.Management.Infrastructure.CimInstance] $record)
     {
         $dscResourceObject = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] @{
 <%

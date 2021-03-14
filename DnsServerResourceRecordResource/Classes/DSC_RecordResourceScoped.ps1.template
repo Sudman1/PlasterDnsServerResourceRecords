@@ -53,12 +53,12 @@ class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped : DnsRecord<%= $PL
         return ([DnsRecordBase] $this).Test()
     }
 
-    hidden [ciminstance] GetResourceRecord()
+    hidden [Microsoft.Management.Infrastructure.CimInstance] GetResourceRecord()
     {
         return ([DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] $this).GetResourceRecord()
     }
 
-    hidden [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] NewDscResourceObjectFromRecord([ciminstance] $record)
+    hidden [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] NewDscResourceObjectFromRecord([Microsoft.Management.Infrastructure.CimInstance] $record)
     {
         $dscResourceObject = [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] @{
 <%
