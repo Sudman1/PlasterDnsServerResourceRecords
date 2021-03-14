@@ -16,11 +16,11 @@ $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object {
 "            $('ZoneName'.PadRight($padSize)) = `$zoneName"
 "            $('ZoneScope'.PadRight($padSize)) = `$zoneScope"
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Key'})) {
     "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
 }
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Mandatory'})) {
     "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
 }
 %>
@@ -34,15 +34,15 @@ $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object {
 "            $('ZoneName'.PadRight($padSize)) = `$zoneName"
 "            $('ZoneScope'.PadRight($padSize)) = `$zoneScope"
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Key'})) {
     "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
 }
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Mandatory'})) {
     "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleUndesiredValue)"
 }
 
-foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {-not $_.Required})) {
     "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleUndesiredValue)"
 }
 
@@ -60,11 +60,11 @@ $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object {
 "            $('ZoneName'.PadRight($padSize)) = `$zoneName"
 "            $('ZoneScope'.PadRight($padSize)) = `$zoneScope"
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Key'})) {
     "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.ExampleDesiredValue)"
 }
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Mandatory'})) {
     "            $($paramDef.Name.PadRight($padSize)) = $($paramDef.EmptyValue)"
 }
 
@@ -104,11 +104,11 @@ $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object {
 "            $('ZoneName'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_CreateRecord_Config.ZoneName"
 "            $('ZoneScope'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_CreateRecord_Config.ZoneScope"
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Key'})) {
 "            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_CreateRecord_Config.$($paramDef.Name)"
 }
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Mandatory'})) {
 "            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_CreateRecord_Config.$($paramDef.Name)"
 }
 %>
@@ -146,15 +146,15 @@ $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object {
 "            $('ZoneName'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.ZoneName"
 "            $('ZoneScope'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.ZoneScope"
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Key'})) {
 "            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.$($paramDef.Name)"
 }
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Mandatory'})) {
 "            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.$($paramDef.Name)"
 }
 
-foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {-not $_.Required})) {
 "            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_ModifyRecord_Config.$($paramDef.Name)"
 }
 
@@ -196,11 +196,11 @@ $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object {
 "            $('ZoneName'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_DeleteRecord_Config.ZoneName"
 "            $('ZoneScope'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_DeleteRecord_Config.ZoneScope"
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Key'})) {
 "            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_DeleteRecord_Config.$($paramDef.Name)"
 }
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Mandatory'})) {
 "            $($paramDef.Name.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_DeleteRecord_Config.$($paramDef.Name)"
 }
 "            $('Ensure'.PadRight($padSize)) = `$ConfigurationData.NonNodeData.DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped_DeleteRecord_Config.Ensure"

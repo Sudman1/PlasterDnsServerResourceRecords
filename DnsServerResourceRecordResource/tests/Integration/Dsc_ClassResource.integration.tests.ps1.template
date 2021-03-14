@@ -75,21 +75,21 @@ try
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Key'})) {
 "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
 }
 ""
 
-if ($propertyData | Where-Object {$_.Required -eq 'Mandatory'}) {
+if ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Mandatory'}) {
     "                # Mandatory properties"
-    foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+    foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Mandatory'})) {
     "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
     }
     ""
 }
 
 "                # Optional properties were not specified, so we just need to ensure the value exists"
-foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {-not $_.Required})) {
 "                `$resourceCurrentState.$($paramDef.Name) | Should -Not -Be `$null"
 }
 "                `$resourceCurrentState.TimeToLive | Should -Not -Be `$null"
@@ -149,21 +149,21 @@ foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Key'})) {
 "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
 }
 ""
 
-if ($propertyData | Where-Object {$_.Required -eq 'Mandatory'}) {
+if ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Mandatory'}) {
     "                # Mandatory properties"
-    foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+    foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Mandatory'})) {
     "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
     }
     ""
 }
 
 "                # Optional properties"
-foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {-not $_.Required})) {
 "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
 }
 "                `$resourceCurrentState.TimeToLive | Should -Be `$shouldBeData.TimeToLive"
@@ -223,21 +223,21 @@ foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
 <%
 $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
-foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Key'})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Key'})) {
 "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
 }
 ""
 
-if ($propertyData | Where-Object {$_.Required -eq 'Mandatory'}) {
+if ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Mandatory'}) {
     "                # Mandatory properties"
-    foreach ($paramDef in ($propertyData | Where-Object {$_.Required -eq 'Mandatory'})) {
+    foreach ($paramDef in ($propertyData | Where-Object -FilterScript {$_.Required -eq 'Mandatory'})) {
     "                `$resourceCurrentState.$($paramDef.Name) | Should -Be `$shouldBeData.$($paramDef.Name)"
     }
     ""
 }
 
 "                # Optional properties"
-foreach ($paramDef in ($propertyData | Where-Object {-not $_.Required})) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript {-not $_.Required})) {
 @"
 if (`$shouldBeData.$($paramDef.Name))
 {

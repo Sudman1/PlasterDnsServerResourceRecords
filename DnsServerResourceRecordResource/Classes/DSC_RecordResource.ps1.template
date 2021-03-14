@@ -74,7 +74,7 @@ class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> : DnsRecordBase
             $dnsParameters['ZoneScope'] = $this.ZoneScope
         }
 
-        $record = Get-DnsServerResourceRecord @dnsParameters -ErrorAction SilentlyContinue | Where-Object {
+        $record = Get-DnsServerResourceRecord @dnsParameters -ErrorAction SilentlyContinue | Where-Object -FilterScript {
             <#
                 Add any additional filtering criteria necessary here and remove the throw. Such as:
                 $_.HostName -eq $recordHostName -and
@@ -97,18 +97,18 @@ $padsize = [Math]::Max('TimeToLive'.length, ($propertyData.Name | ForEach-Object
 
 "            $('ZoneName'.PadRight($padSize)) = `$this.ZoneName"
 
-foreach ($paramDef in ($propertyData | Where-Object { $_.Required -eq 'Key' })) {
+foreach ($paramDef in ($propertyData | Where-Object -FilterScript { $_.Required -eq 'Key' })) {
     "            $($paramDef.Name.PadRight($padSize)) = `$this.$($paramDef.Name)"
 }
 
-if ($propertyData | Where-Object { $_.Required -ne 'Key' }) {
+if ($propertyData | Where-Object -FilterScript { $_.Required -ne 'Key' }) {
     "            # Apply values from $record as appropriate below"
 
-    foreach ($paramDef in ($propertyData | Where-Object { $_.Required -eq 'Mandatory' })) {
+    foreach ($paramDef in ($propertyData | Where-Object -FilterScript { $_.Required -eq 'Mandatory' })) {
         "            $($paramDef.Name.PadRight($padSize)) = throw 'NewDscResourceObjectFromRecord $($paramDef.Name) property not defined'"
     }
 
-    foreach ($paramDef in ($propertyData | Where-Object { -not $_.Required })) {
+    foreach ($paramDef in ($propertyData | Where-Object -FilterScript { -not $_.Required })) {
         "            $($paramDef.Name.PadRight($padSize)) = throw 'NewDscResourceObjectFromRecord $($paramDef.Name) property not defined'"
     }
 }

@@ -48,7 +48,7 @@ Configuration DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped_Mandatory_
         DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped 'TestRecord'
         {
 <%
-$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object { $_.Required }
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv" | Where-Object -FilterScript { $_.Required }
 
 $padsize = [Math]::Max('ZoneName'.length, ($propertyData.Name | ForEach-Object { $_.length } | Sort-Object -Descending | Select-Object -first 1))
 
