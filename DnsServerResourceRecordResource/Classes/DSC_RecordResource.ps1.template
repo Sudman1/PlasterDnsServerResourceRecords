@@ -1,6 +1,9 @@
 <#
     .SYNOPSIS
-        A DSC Resource for MS DNS Server that represents an <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> resource record.
+        The DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> DSC resource manages <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> DNS records against a specific zone on a Domain Name System (DNS) server.
+
+    .Description
+        The DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> DSC resource manages <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> DNS records against a specific zone on a Domain Name System (DNS) server.
 
     .PARAMETER ZoneName
         Specifies the name of a DNS zone. (Key Parameter)
