@@ -1,21 +1,26 @@
 <#
     .SYNOPSIS
         A DSC Resource for MS DNS Server that represents an <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> resource record.
+
     .PARAMETER ZoneName
         Specifies the name of a DNS zone. (Key Parameter)
 <%
     $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
     foreach ($paramDef in $propertyData) {
+        ""
         "    .PARAMETER $($paramDef.Name)"
         if ([string]::IsNullOrEmpty($paramDef.Required)) { $paramDef.Required = "Optional" }
         "       $($paramDef.Description) ($($paramDef.Required) Parameter)"
     }
 %>
+
     .PARAMETER TimeToLive
         Specifies the TimeToLive value of the <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> record. Value must be in valid TimeSpan string format (i.e.: Days.Hours:Minutes:Seconds.Miliseconds or 30.23:59:59.999).
+
     .PARAMETER DnsServer
-        Name of the DnsServer to create the record on.
+        Name of the DnsServer on which to create the record.
+
     .PARAMETER Ensure
         Whether the host record should be present or removed.
 #>
