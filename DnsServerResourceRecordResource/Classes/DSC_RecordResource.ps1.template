@@ -25,7 +25,7 @@
         Whether the host record should be present or removed.
 #>
 
-$script:localizedDataDnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> = Get-LocalizedData -DefaultUICulture en-US -FileName 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>.strings.psd1'
+$script:localizedDataDnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> = Get-LocalizedData -DefaultUICulture 'en-US' -FileName 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>.strings.psd1'
 
 [DscResource()]
 class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> : DnsRecordBase
