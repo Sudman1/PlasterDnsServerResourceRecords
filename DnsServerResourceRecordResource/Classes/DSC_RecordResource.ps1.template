@@ -2,7 +2,7 @@
     .SYNOPSIS
         The DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> DSC resource manages <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> DNS records against a specific zone on a Domain Name System (DNS) server.
 
-    .Description
+    .DESCRIPTION
         The DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> DSC resource manages <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> DNS records against a specific zone on a Domain Name System (DNS) server.
 
     .PARAMETER ZoneName

@@ -2,7 +2,7 @@
     .SYNOPSIS
         The DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped DSC resource manages <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> DNS records against a specific zone and zone scope on a Domain Name System (DNS) server.
 
-    .Description
+    .DESCRIPTION
         The DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped DSC resource manages <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> DNS records against a specific zone and zone scope on a Domain Name System (DNS) server.
 
     .PARAMETER ZoneName
