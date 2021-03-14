@@ -10,7 +10,7 @@
     foreach ($paramDef in $propertyData) {
         ""
         "    .PARAMETER $($paramDef.Name)"
-        if ([string]::IsNullOrEmpty($paramDef.Required)) { $paramDef.Required = "Optional" }
+        if ([System.String]::IsNullOrEmpty($paramDef.Required)) { $paramDef.Required = "Optional" }
         "       $($paramDef.Description) ($($paramDef.Required) Parameter)"
     }
 %>
@@ -35,9 +35,11 @@ class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> : DnsRecordBase
     $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
     foreach ($paramDef in $propertyData) {
-        "    [DscProperty($($paramDef.Required))]"
-        "    [$($paramDef.ObjectType)] `$$($paramDef.Name)"
-        ""
+        @"    [DscProperty($($paramDef.Required))]
+    [$($paramDef.ObjectType)]
+    `$$($paramDef.Name)
+
+"@
     }
 %>
     [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] Get()

@@ -14,7 +14,7 @@
     foreach ($paramDef in $propertyData) {
         ""
         "    .PARAMETER $($paramDef.Name)"
-        if ([string]::IsNullOrEmpty($paramDef.Required)) { $paramDef.Required = "Optional" }
+        if ([System.String]::IsNullOrEmpty($paramDef.Required)) { $paramDef.Required = "Optional" }
         "       $($paramDef.Description) ($($paramDef.Required) Parameter)"
     }
 %>
@@ -35,7 +35,8 @@ $script:localizedDataDnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped = G
 class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped : DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>
 {
     [DscProperty(Key)]
-    [string] $ZoneScope
+    [System.String]
+    $ZoneScope
 
     [DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped] Get()
     {
