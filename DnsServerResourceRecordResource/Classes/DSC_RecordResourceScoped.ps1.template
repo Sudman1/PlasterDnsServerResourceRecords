@@ -51,7 +51,7 @@ class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped : DnsRecord<%= $PL
         ([DnsRecordBase] $this).Set()
     }
 
-    [bool] Test()
+    [System.Boolean] Test()
     {
         return ([DnsRecordBase] $this).Test()
     }

@@ -96,7 +96,7 @@ $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_Resour
 
 if ($propertyData) {
     foreach ($paramDef in $propertyData) {
-        "                [bool] `$getMethodResourceResult.$($paramDef.Name) | Should -BeFalse"
+        "                [System.Boolean] `$getMethodResourceResult.$($paramDef.Name) | Should -BeFalse"
     }
 }
 %>                $getMethodResourceResult.TimeToLive | Should -BeNullOrEmpty
