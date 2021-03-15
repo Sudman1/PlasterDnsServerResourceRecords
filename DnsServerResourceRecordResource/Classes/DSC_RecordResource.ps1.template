@@ -4,9 +4,6 @@
 
     .DESCRIPTION
         The DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> DSC resource manages <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> DNS records against a specific zone on a Domain Name System (DNS) server.
-
-    .PARAMETER ZoneName
-        Specifies the name of a DNS zone. (Key Parameter)
 <%
     $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
@@ -17,15 +14,6 @@
         "       $($paramDef.Description) ($($paramDef.Required) Parameter)"
     }
 %>
-
-    .PARAMETER TimeToLive
-        Specifies the TimeToLive value of the <%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %> record. Value must be in valid TimeSpan string format (i.e.: Days.Hours:Minutes:Seconds.Miliseconds or 30.23:59:59.999).
-
-    .PARAMETER DnsServer
-        Name of the DnsServer on which to create the record.
-
-    .PARAMETER Ensure
-        Whether the host record should be present or removed.
 #>
 
 $script:localizedDataDnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> = Get-LocalizedData -DefaultUICulture 'en-US' -FileName 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>.strings.psd1'
