@@ -16,8 +16,6 @@
 %>
 #>
 
-$script:localizedDataDnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> = Get-LocalizedData -DefaultUICulture 'en-US' -FileName 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>.strings.psd1'
-
 [DscResource()]
 class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> : DnsRecordBase
 {
@@ -26,7 +24,8 @@ class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> : DnsRecordBase
     $propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
 
     foreach ($paramDef in $propertyData) {
-        @"    [DscProperty($($paramDef.Required))]
+        @"
+    [DscProperty($($paramDef.Required))]
     [$($paramDef.ObjectType)]
     `$$($paramDef.Name)
 
@@ -50,7 +49,7 @@ class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %> : DnsRecordBase
 
     hidden [Microsoft.Management.Infrastructure.CimInstance] GetResourceRecord()
     {
-        Write-Verbose -Message ($script:localizedDataDnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>.GettingDnsRecordMessage -f '<%= $PLASTER_PARAM_ResourceRecordType %>', $this.ZoneName, $this.ZoneScope, $this.DnsServer)
+        Write-Verbose -Message ($this.localizedData.GettingDnsRecordMessage -f '<%= $PLASTER_PARAM_ResourceRecordType %>', $this.ZoneName, $this.ZoneScope, $this.DnsServer)
 
         $dnsParameters = @{
             ZoneName     = $this.ZoneName
@@ -133,8 +132,70 @@ if ($propertyData | Where-Object -FilterScript { $_.Required -ne 'Key' }) {
             $dnsParameters.Add('TimeToLive', $this.TimeToLive)
         }
 
-        Write-Verbose -Message ($script:localizedDataDnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>.CreatingDnsRecordMessage -f '<%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %>', $this.ZoneName, $this.ZoneScope, $this.DnsServer)
+        Write-Verbose -Message ($this.localizedData.CreatingDnsRecordMessage -f '<%= $PLASTER_PARAM_ResourceRecordType.ToUpper() %>', $this.ZoneName, $this.ZoneScope, $this.DnsServer)
 
         Add-DnsServerResourceRecord @dnsParameters
+    }
+
+    hidden [void] ModifyResourceRecord([Microsoft.Management.Infrastructure.CimInstance] $existingRecord, [System.Collections.Hashtable[]] $propertiesNotInDesiredState)
+    {
+        $recordHostName = $this.getRecordHostName()
+
+        $dnsParameters = @{
+            ZoneName     = $this.ZoneName
+            ComputerName = $this.DnsServer
+        }
+
+        if ($this.isScoped)
+        {
+            $dnsParameters['ZoneScope'] = $this.ZoneScope
+        }
+
+        # Copy the existing record and modify values as appropriate
+        $newRecord = [Microsoft.Management.Infrastructure.CimInstance]::new($existingRecord)
+
+        foreach ($propertyToChange in $propertiesNotInDesiredState)
+        {
+            switch ($propertyToChange.Property)
+            {
+                # Key parameters will never be affected, so only include Mandatory and Optional values in the switch statement
+<%
+$propertyData = Import-CSV -Path "$PLASTER_PARAM_PropDir/$($PLASTER_PARAM_ResourceRecordType)Props.csv"
+
+if ($propertyData | Where-Object -FilterScript { $_.Required -ne 'Key' }) {
+    "            # Apply values to `$newRecord as appropriate below"
+
+    foreach ($paramDef in ($propertyData | Where-Object -FilterScript { $_.Required -eq 'Mandatory' })) {
+        @"
+                '$($paramDef.Name)'
+                {
+                    # `$newRecord.RecordData.$($paramDef.Name) = `$propertyToChange.ExpectedValue
+                    throw 'Logic required to modify the record''s $($paramDef.Name) value does not exist'
+                }
+
+"@
+    }
+
+    foreach ($paramDef in ($propertyData | Where-Object -FilterScript { -not $_.Required })) {
+        @"
+                '$($paramDef.Name)'
+                {
+                    # `$newRecord.RecordData.$($paramDef.Name) = `$propertyToChange.ExpectedValue
+                    throw 'Logic required to modify the record''s $($paramDef.Name) value does not exist'
+                }
+
+"@
+    }
+}
+%>
+                'TimeToLive'
+                {
+                    $newRecord.TimeToLive = [System.TimeSpan] $propertyToChange.ExpectedValue
+                }
+
+            }
+        }
+
+        Set-DnsServerResourceRecord @dnsParameters -OldInputObject $existingRecord -NewInputObject $newRecord -Verbose
     }
 }

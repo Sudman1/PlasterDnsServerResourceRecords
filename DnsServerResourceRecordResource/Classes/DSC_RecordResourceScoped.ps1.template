@@ -78,4 +78,9 @@ if ($propertyData | Where-Object -FilterScript { $_.Required -ne 'Key' }) {
     {
         ([DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] $this).AddResourceRecord()
     }
+
+    hidden [void] ModifyResourceRecord([Microsoft.Management.Infrastructure.CimInstance] $existingRecord, [System.Collections.Hashtable[]] $propertiesNotInDesiredState)
+    {
+        ([DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>] $this).ModifyResourceRecord($existingRecord, $propertiesNotInDesiredState)
+    }
 }
