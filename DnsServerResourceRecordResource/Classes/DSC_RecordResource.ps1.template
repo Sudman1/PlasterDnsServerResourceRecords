@@ -139,8 +139,6 @@ if ($propertyData | Where-Object -FilterScript { $_.Required -ne 'Key' }) {
 
     hidden [void] ModifyResourceRecord([Microsoft.Management.Infrastructure.CimInstance] $existingRecord, [System.Collections.Hashtable[]] $propertiesNotInDesiredState)
     {
-        $recordHostName = $this.getRecordHostName()
-
         $dnsParameters = @{
             ZoneName     = $this.ZoneName
             ComputerName = $this.DnsServer
