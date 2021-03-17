@@ -9,8 +9,6 @@
         Specifies the name of a zone scope. (Key Parameter)
 #>
 
-$script:localizedDataDnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped = Get-LocalizedData -DefaultUICulture 'en-US' -FileName 'DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped.strings.psd1'
-
 [DscResource()]
 class DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>Scoped : DnsRecord<%= $PLASTER_PARAM_ResourceRecordType %>
 {
