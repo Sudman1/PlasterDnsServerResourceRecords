@@ -48,18 +48,10 @@
             destination='source/en-US/DnsRecord${PLASTER_PARAM_ResourceRecordType}.strings.psd1'
       />
 
-      <!--   source/en-US/DnsRecordResource.strings.pd1 file -->
-      <templateFile source='en-US/DnsRecordResource.strings.psd1.template'
+      <!--   source/en-US/DnsRecordResourceScoped.strings.pd1 file -->
+      <templateFile source='en-US/DnsRecordResourceScoped.strings.psd1.template'
             destination='source/en-US/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped.strings.psd1'
       />
-
-      <!--   replace DnsRecordXXXX with DnsRecordXXXScoped in the scoped strings doc-->
-      <modify path='source/en-US/DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped.strings.psd1'>
-            <replace condition="$PLASTER_FileContent -notmatch 'DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped'">
-                  <original expand='true'>DnsRecord$($PLASTER_PARAM_ResourceRecordType)</original>
-                  <substitute expand='true'>DnsRecord$($PLASTER_PARAM_ResourceRecordType)Scoped</substitute>
-            </replace>
-      </modify>
 
       <!--   tests/Unit/Classes Folder -->
       <file source='' destination='tests/Unit/Classes' />
