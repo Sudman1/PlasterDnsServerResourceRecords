@@ -1,0 +1,3 @@
+Name,Required,ObjectType,Description,ExampleDesiredValue,ExampleUndesiredValue,EmptyValue
+IpAddress,Key,System.String,"Specifies the IP address to which the record is associated (Can be either IPv4 or IPv6.",'192.168.0.9',,
+Name,Key,System.String,"Specifies the FQDN of the host when you add a PTR resource record.",'quarks.contoso.com',,
