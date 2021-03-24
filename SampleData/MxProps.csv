@@ -1,0 +1,4 @@
+Name,Required,ObjectType,Description,ExampleDesiredValue,ExampleUndesiredValue,EmptyValue
+EmailDomain,Key,System.String,"Everything after the '@' in the email addresses supported by this mail exchanger. It must be a subdomain the zone or the zone itself. To specify all subdomains, use the '*' character (i.e.: *.contoso.com).",'contoso.com',,,
+MailExchange,Key,System.String,"FQDN of the server handling email for the specified email domain. When setting the value, this FQDN must resolve to an IP address and cannot reference a CNAME record.",'mailserver1.contoso.com'',,,
+Priority,Mandatory,System.UInt16,"Specifies the priority for this MX record among other MX records that belong to the same email domain, where a lower value has a higher priority.",20,200,0
