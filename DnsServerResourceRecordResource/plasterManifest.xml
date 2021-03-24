@@ -35,12 +35,12 @@
 
       <!--   source/Classes/DSC_RecordResource.ps1 file -->
       <templateFile source='Classes/DSC_RecordResource.ps1.template'
-            destination='source/Classes/002.DnsRecord${PLASTER_PARAM_ResourceRecordType}.ps1'
+            destination='source/Classes/003.DnsRecord${PLASTER_PARAM_ResourceRecordType}.ps1'
       />
 
       <!--   source/Classes/DSC_RecordResourceScoped.ps1 file -->
       <templateFile source='Classes/DSC_RecordResourceScoped.ps1.template'
-            destination='source/Classes/003.DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped.ps1'
+            destination='source/Classes/004.DnsRecord${PLASTER_PARAM_ResourceRecordType}Scoped.ps1'
       />
 
       <!--   source/en-US/DnsRecordResource.strings.pd1 file -->
