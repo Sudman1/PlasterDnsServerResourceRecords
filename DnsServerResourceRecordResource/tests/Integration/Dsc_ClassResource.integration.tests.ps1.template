@@ -105,6 +105,8 @@ foreach ($paramDef in ($propertyData | Where-Object -FilterScript {-not $_.Requi
             }
         }
 
+        Wait-ForIdleLcm -Clear
+
         $configurationName = "$($script:dscResourceName)_ModifyRecord_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
@@ -178,6 +180,8 @@ foreach ($paramDef in ($propertyData | Where-Object -FilterScript {-not $_.Requi
                 Test-DscConfiguration -Verbose | Should -Be 'True'
             }
         }
+
+        Wait-ForIdleLcm -Clear
 
         $configurationName = "$($script:dscResourceName)_DeleteRecord_Config"
 
