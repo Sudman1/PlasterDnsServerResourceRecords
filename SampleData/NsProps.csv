@@ -1,0 +1,3 @@
+Name,Required,ObjectType,Description,ExampleDesiredValue,ExampleUndesiredValue,EmptyValue
+Name,Key,System.String,"Specifies the fully qualified domain name for which the NameServer is authoritative. It must be a subdomain the zone or the zone itself. To specify all subdomains, use the '*' character (i.e.: *.contoso.com).",'contoso.com',,
+NameServer,Key,System.String,"Specifies the name server of a domain. This should be a fully qualified domain name, not an IP address",ns.contoso.com,,
